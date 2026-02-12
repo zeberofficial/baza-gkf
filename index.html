@@ -154,7 +154,7 @@ h1 {
 
 let adminToken = null;
 
-const API_URL = "https://https://sid-api.jakub-rauhut.workers.dev";
+const API_URL = "https://sid-api.jakub-rauhut.workers.dev";
 
 async function adminLogin() {
     try {
@@ -162,8 +162,9 @@ async function adminLogin() {
         const pass = document.getElementById("adminPass").value;
 
         const response = await fetch(
-            `${API_URL}?action=login&login=${encodeURIComponent(login)}&password=${encodeURIComponent(pass)}`
-        );
+  `${API_URL}?action=login&login=${encodeURIComponent(login)}&password=${encodeURIComponent(pass)}`
+);
+
 
         const result = await response.json();
 
