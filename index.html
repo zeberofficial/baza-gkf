@@ -181,36 +181,38 @@ async function adminLogin() {
     }
 }
 
-async function saveUser() {
-    if (!adminToken) {
-        alert("Brak autoryzacji");
-        return;
-    }
+async function adminLogin() {
+    try {
+        const login = document.getElementById("adminLogin").value;
+        const pass = document.getElementById("adminPass").value;
 
-    const data = {
-        SID: document.getElementById("newSID").value,
-        Nick: document.getElementById("newNick").value,
-        Status: document.getElementById("newStatus").value,
-        Opis: document.getElementById("newOpis").value
-    };
+        const response = await fetch(API_URL, {
+            method: "POST",
+            mode: "cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: "login",
+                login: login,
+                password: pass
+            })
+        });
 
-    const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            action: "save",
-            token: adminToken,
-            data: data
-        })
-    });
+        const text = await response.text();
+        console.log("RAW RESPONSE:", text);
 
-    const result = await response.json();
+        const result = JSON.parse(text);
 
-    if (result.success) {
-        alert("Zapisano!");
-        searchSID();
-    } else {
-        alert("Błąd zapisu");
+        if (result.token) {
+            adminToken = result.token;
+            document.getElementById("adminPanel").style.display = "block";
+            alert("Zalogowano");
+        } else {
+            alert("Złe dane");
+        }
+
+    } catch (err) {
+        console.error("LOGIN ERROR:", err);
+        alert("Błąd logowania — sprawdź konsolę");
     }
 }
 
