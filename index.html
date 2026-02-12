@@ -156,66 +156,65 @@ let adminToken = null;
 
 const API_URL = "https://script.google.com/macros/s/AKfycbxOQfDSCOwU3k8HKsYG3OurG9VRt8owORZdLq-9PxNt75QsND33qaelhajpQKwStBwQ/exec";
 
-async function adminLogin() {
-    const login = document.getElementById("adminLogin").value;
-    const pass = document.getElementById("adminPass").value;
-
-    const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            action: "login",
-            login: login,
-            password: pass
-        })
-    });
-
-    const result = await response.json();
-
-    if (result.token) {
-        adminToken = result.token;
-        document.getElementById("adminPanel").style.display = "block";
-        alert("Zalogowano jako admin");
-    } else {
-        alert("Błędny login lub hasło");
-    }
-}
-
+// 🔐 LOGOWANIE (GET - bez CORS problemu)
 async function adminLogin() {
     try {
         const login = document.getElementById("adminLogin").value;
         const pass = document.getElementById("adminPass").value;
 
-        const response = await fetch(API_URL, {
-            method: "POST",
-            mode: "cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                action: "login",
-                login: login,
-                password: pass
-            })
-        });
+        const response = await fetch(
+            `${API_URL}?action=login&login=${encodeURIComponent(login)}&password=${encodeURIComponent(pass)}`
+        );
 
-        const text = await response.text();
-        console.log("RAW RESPONSE:", text);
-
-        const result = JSON.parse(text);
+        const result = await response.json();
 
         if (result.token) {
             adminToken = result.token;
             document.getElementById("adminPanel").style.display = "block";
-            alert("Zalogowano");
+            alert("Zalogowano jako admin");
         } else {
-            alert("Złe dane");
+            alert("Błędny login lub hasło");
         }
 
     } catch (err) {
         console.error("LOGIN ERROR:", err);
-        alert("Błąd logowania — sprawdź konsolę");
+        alert("Błąd logowania");
     }
 }
 
+// 💾 ZAPIS / EDYCJA
+async function saveUser() {
+    if (!adminToken) {
+        alert("Brak autoryzacji");
+        return;
+    }
+
+    const SID = document.getElementById("newSID").value;
+    const Nick = document.getElementById("newNick").value;
+    const Status = document.getElementById("newStatus").value;
+    const Opis = document.getElementById("newOpis").value;
+
+    try {
+        const response = await fetch(
+            `${API_URL}?action=save&token=${adminToken}&SID=${encodeURIComponent(SID)}&Nick=${encodeURIComponent(Nick)}&Status=${encodeURIComponent(Status)}&Opis=${encodeURIComponent(Opis)}`
+        );
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert("Zapisano!");
+            searchSID();
+        } else {
+            alert("Błąd zapisu");
+        }
+
+    } catch (err) {
+        console.error("SAVE ERROR:", err);
+        alert("Błąd zapisu");
+    }
+}
+
+// 🔎 WYSZUKIWANIE SID (z Google Sheets CSV)
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQADbYEdftOlszRFS0BazxsoTfB_iUc0iwSlniqjpyKqpTF0k7WLCqVkytB4JXYLgEoCPH99QG_yn_D/pub?gid=0&single=true&output=csv";
 
 async function searchSID() {
@@ -245,7 +244,7 @@ async function searchSID() {
         }
 
     } catch (err) {
-        console.error(err);
+        console.error("SEARCH ERROR:", err);
         document.getElementById("result").innerHTML = "⚠ Błąd ładowania danych.";
     }
 }
