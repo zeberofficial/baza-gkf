@@ -1,50 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>Wyszukiwarka GKF</title>
+<title>Wyszukiwarka SID</title>
 
 <style>
 body {
-    background-color: #0f172a;
-    font-family: Arial, sans-serif;
-    color: #e2e8f0;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at top, #1a0f2e, #090014);
+    color: white;
     text-align: center;
-    padding-top: 60px;
 }
 
 .container {
-    background: #1e293b;
-    width: 400px;
-    margin: auto;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    padding-top: 80px;
 }
 
-input {
-    width: 80%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
+.logo {
+    width: 60px;
+    margin-bottom: 15px;
+}
+
+h1 {
+    font-size: 32px;
+    margin: 10px 0 5px 0;
+}
+
+.subtitle {
+    color: #aaa;
+    margin-bottom: 30px;
+}
+
+.search-box {
+    display: inline-flex;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.search-box input {
     border: none;
-}
-
-button {
-    padding: 10px 20px;
-    background-color: #2563eb;
+    background: transparent;
+    padding: 12px;
     color: white;
+    width: 250px;
+    outline: none;
+}
+
+.search-box button {
+    background: #ff2d55;
     border: none;
-    border-radius: 5px;
+    padding: 12px 20px;
+    color: white;
+    border-radius: 8px;
     cursor: pointer;
+    font-weight: bold;
 }
 
-button:hover {
-    background-color: #1d4ed8;
+.search-box button:hover {
+    background: #e11d48;
 }
 
-.result {
-    margin-top: 20px;
+.result-box {
+    margin: 40px auto;
+    width: 70%;
+    min-height: 250px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 15px;
+    padding: 20px;
+    backdrop-filter: blur(15px);
     text-align: left;
 }
 </style>
@@ -53,37 +79,57 @@ button:hover {
 <body>
 
 <div class="container">
-    <h2>🔎 Wyszukiwarka GKF</h2>
-    <input type="text" id="sidInput" placeholder="Wpisz SID">
-    <br>
-    <button onclick="searchSID()">Szukaj</button>
-    <div class="result" id="result"></div>
+
+    <!-- PODMIEŃ NA SWOJE LOGO -->
+    <img src="https://dailymta.pl/FORUM/uploads/monthly_2024_01/logo512.png.b88e4caaa9beddd2d8365bfce33c4f2a.png" class="logo">
+
+    <h1>Wyszukiwarka SID</h1>
+    <div class="subtitle">Baza danych użytkowników na serwerze.</div>
+
+    <div class="search-box">
+        <input type="text" id="sidInput" placeholder="Wpisz SID">
+        <button onclick="searchSID()">SZUKAJ</button>
+    </div>
+
+    <div class="result-box" id="result">
+        Wyniki wyszukiwania pojawią się tutaj...
+    </div>
+
 </div>
 
 <script>
 
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQADbYEdftOlszRFS0BazxsoTfB_iUc0iwSlniqjpyKqpTF0k7WLCqVkytB4JXYLgEoCPH99QG_yn_D/pub?gid=0&single=true&output=csv";
-const proxy = "https://api.allorigins.win/raw?url=";
 
 async function searchSID() {
+    try {
+        const sid = document.getElementById("sidInput").value.trim();
+        if (!sid) return;
 
-    const sid = document.getElementById("sidInput").value;
-    const response = await fetch(proxy + encodeURIComponent(sheetURL));
-    const data = await response.text();
+        const response = await fetch(sheetURL + "&cache=" + Date.now());
+        const text = await response.text();
 
-    const rows = data.trim().split("\n").map(r => r.split(","));
-    const headers = rows[0];
+        const rows = text.split("\n").map(r => r.split(","));
+        const headers = rows[0];
+        const dataRows = rows.slice(1);
 
-    const match = rows.find(row => row[0] === sid);
+        const match = dataRows.find(row => row[0] === sid);
 
-    if (match) {
-        let html = "<h3>USER DATA:</h3>";
-        headers.forEach((header, i) => {
-            html += `<p><strong>${header}:</strong> ${match[i]}</p>`;
-        });
-        document.getElementById("result").innerHTML = html;
-    } else {
-        document.getElementById("result").innerHTML = "❌ Brak wpisów w bazie";
+        const resultBox = document.getElementById("result");
+
+        if (match) {
+            let html = "<h3>Dane użytkownika:</h3>";
+            headers.forEach((header, i) => {
+                html += `<p><strong>${header}:</strong> ${match[i] || ""}</p>`;
+            });
+            resultBox.innerHTML = html;
+        } else {
+            resultBox.innerHTML = "❌ Nie znaleziono SID.";
+        }
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById("result").innerHTML = "⚠ Błąd ładowania danych.";
     }
 }
 
