@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Wyszukiwarka GKF</title>
+
+<style>
+body {
+    background-color: #0f172a;
+    font-family: Arial, sans-serif;
+    color: #e2e8f0;
+    text-align: center;
+    padding-top: 60px;
+}
+
+.container {
+    background: #1e293b;
+    width: 400px;
+    margin: auto;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+input {
+    width: 80%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: none;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #1d4ed8;
+}
+
+.result {
+    margin-top: 20px;
+    text-align: left;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>🔎 Wyszukiwarka GKF</h2>
+    <input type="text" id="sidInput" placeholder="Wpisz SID">
+    <br>
+    <button onclick="searchSID()">Szukaj</button>
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQADbYEdftOlszRFS0BazxsoTfB_iUc0iwSlniqjpyKqpTF0k7WLCqVkytB4JXYLgEoCPH99QG_yn_D/pub?gid=0&single=true&output=csv";
+const proxy = "https://api.allorigins.win/raw?url=";
+
+async function searchSID() {
+
+    const sid = document.getElementById("sidInput").value;
+    const response = await fetch(proxy + encodeURIComponent(sheetURL));
+    const data = await response.text();
+
+    const rows = data.trim().split("\n").map(r => r.split(","));
+    const headers = rows[0];
+
+    const match = rows.find(row => row[0] === sid);
+
+    if (match) {
+        let html = "<h3>USER DATA:</h3>";
+        headers.forEach((header, i) => {
+            html += `<p><strong>${header}:</strong> ${match[i]}</p>`;
+        });
+        document.getElementById("result").innerHTML = html;
+    } else {
+        document.getElementById("result").innerHTML = "❌ Brak wpisów w bazie";
+    }
+}
+
+</script>
+
+</body>
+</html>
