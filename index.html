@@ -76,11 +76,50 @@ h1 {
     backdrop-filter: blur(15px);
     text-align: left;
 }
+
+.admin-bar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 8px;
+    background: rgba(0,0,0,0.4);
+    padding: 8px;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.admin-bar input {
+    padding: 6px;
+    border-radius: 4px;
+    border: none;
+    width: 100px;
+}
+
+.admin-bar button {
+    background: #ff2d55;
+    border: none;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.admin-bar button:hover {
+    background: #e11d48;
+}
+
 </style>
 </head>
 
 <body>
 
+<div class="admin-bar">
+    <input type="text" id="adminLogin" placeholder="Login">
+    <input type="password" id="adminPass" placeholder="Hasło">
+    <button onclick="adminLogin()">Zaloguj</button>
+</div>
+    
 <div class="container">
 
     <!-- PODMIEŃ NA SWOJE LOGO -->
@@ -98,9 +137,82 @@ h1 {
         Wyniki wyszukiwania pojawią się tutaj...
     </div>
 
+    <div id="adminPanel" style="display:none; margin-top:20px;">
+    <h3>Panel Admina</h3>
+
+    <input type="text" id="newSID" placeholder="SID"><br><br>
+    <input type="text" id="newNick" placeholder="Nick"><br><br>
+    <input type="text" id="newStatus" placeholder="Status"><br><br>
+    <textarea id="newOpis" placeholder="Opis" rows="4" style="width:100%;"></textarea><br><br>
+
+    <button onclick="saveUser()">Zapisz / Edytuj</button>
+</div>
+
 </div>
 
 <script>
+
+let adminToken = null;
+
+const API_URL = "https://script.google.com/macros/s/AKfycbxOQfDSCOwU3k8HKsYG3OurG9VRt8owORZdLq-9PxNt75QsND33qaelhajpQKwStBwQ/exec";
+
+async function adminLogin() {
+    const login = document.getElementById("adminLogin").value;
+    const pass = document.getElementById("adminPass").value;
+
+    const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            action: "login",
+            login: login,
+            password: pass
+        })
+    });
+
+    const result = await response.json();
+
+    if (result.token) {
+        adminToken = result.token;
+        document.getElementById("adminPanel").style.display = "block";
+        alert("Zalogowano jako admin");
+    } else {
+        alert("Błędny login lub hasło");
+    }
+}
+
+async function saveUser() {
+    if (!adminToken) {
+        alert("Brak autoryzacji");
+        return;
+    }
+
+    const data = {
+        SID: document.getElementById("newSID").value,
+        Nick: document.getElementById("newNick").value,
+        Status: document.getElementById("newStatus").value,
+        Opis: document.getElementById("newOpis").value
+    };
+
+    const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            action: "save",
+            token: adminToken,
+            data: data
+        })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+        alert("Zapisano!");
+        searchSID();
+    } else {
+        alert("Błąd zapisu");
+    }
+}
 
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQADbYEdftOlszRFS0BazxsoTfB_iUc0iwSlniqjpyKqpTF0k7WLCqVkytB4JXYLgEoCPH99QG_yn_D/pub?gid=0&single=true&output=csv";
 
