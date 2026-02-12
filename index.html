@@ -154,9 +154,8 @@ h1 {
 
 let adminToken = null;
 
-const API_URL = "https://script.google.com/macros/s/AKfycbx3FFQAHjal0QolvKCrulXWDm6-cH_1yubMU_HK7LyKhaPHF9sIXLO_EM0n4XC4LKND/exec";
+const API_URL = "https://corsproxy.io/?https://script.google.com/macros/s/AKfycbx3FFQAHjal0QolvKCrulXWDm6-cH_1yubMU_HK7LyKhaPHF9sIXLO_EM0n4XC4LKND/exec";
 
-// 🔐 LOGOWANIE (GET - bez CORS problemu)
 async function adminLogin() {
     try {
         const login = document.getElementById("adminLogin").value;
@@ -181,7 +180,6 @@ async function adminLogin() {
         alert("Błąd logowania");
     }
 }
-
 // 💾 ZAPIS / EDYCJA
 async function saveUser() {
     if (!adminToken) {
