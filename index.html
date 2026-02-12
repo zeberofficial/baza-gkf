@@ -195,12 +195,12 @@ async function saveUser() {
 
     try {
         const response = await fetch(
-    `${API_URL}?action=save&token=${adminToken}` +
-    `&SID=${encodeURIComponent(SID)}` +
-    `&NICK=${encodeURIComponent(NICK)}` +
-    `&STATUS=${encodeURIComponent(STATUS)}` +
-    `&NOTATKI=${encodeURIComponent(NOTATKI)}`
-);
+            `${API_URL}?action=save&token=${adminToken}` +
+            `&SID=${encodeURIComponent(SID)}` +
+            `&NICK=${encodeURIComponent(NICK)}` +
+            `&STATUS=${encodeURIComponent(STATUS)}` +
+            `&NOTATKI=${encodeURIComponent(NOTATKI)}`
+        );
 
         const result = await response.json();
 
