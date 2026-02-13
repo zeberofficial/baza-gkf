@@ -310,42 +310,40 @@ async function searchSID() {
         const text = await response.text();
 
         const rows = text.split("\n").map(r => r.split(","));
-        const headers = rows[0];
         const dataRows = rows.slice(1);
 
         const match = dataRows.find(row => row[0] === sid);
-
         const resultBox = document.getElementById("result");
 
-if (match) {
+        if (match) {
 
-    let html = "<h3>Dane użytkownika:</h3>";
+            let html = "<h3>Dane użytkownika:</h3>";
 
-    html += `<p><strong>SID:</strong> ${match[0]}</p>`;
-    html += `<p><strong>NICK:</strong> ${match[1]}</p>`;
-    html += `<p><strong>STATUS:</strong> ${match[2]}</p>`;
-    html += `<p><strong>NOTATKI:</strong> ${match[3]}</p>`;
+            html += `<p><strong>SID:</strong> ${match[0]}</p>`;
+            html += `<p><strong>NICK:</strong> ${match[1]}</p>`;
+            html += `<p><strong>STATUS:</strong> ${match[2]}</p>`;
+            html += `<p><strong>NOTATKI:</strong> ${match[3]}</p>`;
 
-    html += `<hr style="margin:20px 0; opacity:0.2;">`;
+            html += `<hr style="margin:20px 0; opacity:0.2;">`;
 
-    html += `<p style="color:#aaa; font-size:14px;">
-        Ostatnia edycja: <strong>${match[5] || "-"}</strong> | ${match[4] || "-"}
-    </p>`;
+            html += `<p style="color:#aaa; font-size:14px;">
+                Ostatnia edycja: <strong>${match[5] || "-"}</strong> | ${match[4] || "-"}
+            </p>`;
 
-    resultBox.innerHTML = html;
-}
+            resultBox.innerHTML = html;
 
-    // AUTO-UZUPEŁNIANIE
-    if (adminToken) {
-        document.getElementById("newSID").value = match[0] || "";
-        document.getElementById("newNick").value = match[1] || "";
-        document.getElementById("newStatus").value = match[2] || "";
-        document.getElementById("newNotatki").value = match[3] || "";
-    }
+            // AUTO-UZUPEŁNIANIE DLA ADMINA
+            if (adminToken) {
+                document.getElementById("newSID").value = match[0] || "";
+                document.getElementById("newNick").value = match[1] || "";
+                document.getElementById("newStatus").value = match[2] || "";
+                document.getElementById("newNotatki").value = match[3] || "";
+            }
 
-} else {
-    resultBox.innerHTML = "❌ Nie znaleziono SID.";
-}
+        } else {
+            resultBox.innerHTML = "❌ Nie znaleziono SID.";
+        }
+
     } catch (err) {
         console.error("SEARCH ERROR:", err);
         document.getElementById("result").innerHTML = "⚠ Błąd ładowania danych.";
