@@ -275,12 +275,13 @@ async function saveUser() {
 
     try {
         const response = await fetch(
-            `${API_URL}?action=save&token=${adminToken}` +
-            `&SID=${encodeURIComponent(SID)}` +
-            `&NICK=${encodeURIComponent(NICK)}` +
-            `&STATUS=${encodeURIComponent(STATUS)}` +
-            `&NOTATKI=${encodeURIComponent(NOTATKI)}`
-        );
+    `${API_URL}?action=save&token=${adminToken}` +
+    `&SID=${encodeURIComponent(SID)}` +
+    `&NICK=${encodeURIComponent(NICK)}` +
+    `&STATUS=${encodeURIComponent(STATUS)}` +
+    `&NOTATKI=${encodeURIComponent(NOTATKI)}` +
+    `&ADMIN=${encodeURIComponent(document.getElementById("adminLogin").value)}`
+);
 
         const result = await response.json();
 
@@ -319,7 +320,16 @@ async function searchSID() {
 if (match) {
     let html = "<h3>Dane użytkownika:</h3>";
     headers.forEach((header, i) => {
-        html += `<p><strong>${header}:</strong> ${match[i] || ""}</p>`;
+        html += `<p><strong>SID:</strong> ${match[0]}</p>`;
+html += `<p><strong>NICK:</strong> ${match[1]}</p>`;
+html += `<p><strong>STATUS:</strong> ${match[2]}</p>`;
+html += `<p><strong>NOTATKI:</strong> ${match[3]}</p>`;
+
+html += `<hr style="margin:20px 0; opacity:0.2;">`;
+
+html += `<p style="color:#aaa; font-size:14px;">
+Ostatnia edycja: <strong>${match[5] || "-"}</strong> | ${match[4] || "-"}
+</p>`;
     });
     resultBox.innerHTML = html;
 
