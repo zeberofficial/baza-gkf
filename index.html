@@ -167,6 +167,18 @@ h1 {
     transform: translateY(-2px);
 }
 
+.stats-box {
+    margin-top: 15px;
+    font-size: 16px;
+    color: #ccc;
+}
+
+.stats-box span {
+    color: #ff2d55;
+    font-weight: bold;
+    font-size: 18px;
+}
+
 </style>
 </head>
 
@@ -184,6 +196,10 @@ h1 {
 
     <h1>Wyszukiwarka SID</h1>
     <div class="subtitle">Baza danych użytkowników na serwerze.</div>
+    <div class="stats-box">
+    Wpisanych użytkowników:
+    <span id="userCount">Ładowanie...</span>
+</div>
 
     <div class="search-box">
         <input type="text" id="sidInput" placeholder="Wpisz SID">
@@ -319,6 +335,23 @@ if (match) {
     }
 }
 
+async function loadUserCount() {
+    try {
+        const response = await fetch(sheetURL + "&cache=" + Date.now());
+        const text = await response.text();
+
+        const rows = text.split("\n").filter(r => r.trim() !== "");
+        const count = rows.length - 1; // odejmujemy nagłówek
+
+        document.getElementById("userCount").textContent = count;
+
+    } catch (err) {
+        document.getElementById("userCount").textContent = "Błąd";
+    }
+}
+
+loadUserCount();
+    
 </script>
 
 </body>
