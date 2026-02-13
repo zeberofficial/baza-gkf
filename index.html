@@ -318,20 +318,22 @@ async function searchSID() {
         const resultBox = document.getElementById("result");
 
 if (match) {
+
     let html = "<h3>Dane użytkownika:</h3>";
-    headers.forEach((header, i) => {
-        html += `<p><strong>SID:</strong> ${match[0]}</p>`;
-html += `<p><strong>NICK:</strong> ${match[1]}</p>`;
-html += `<p><strong>STATUS:</strong> ${match[2]}</p>`;
-html += `<p><strong>NOTATKI:</strong> ${match[3]}</p>`;
 
-html += `<hr style="margin:20px 0; opacity:0.2;">`;
+    html += `<p><strong>SID:</strong> ${match[0]}</p>`;
+    html += `<p><strong>NICK:</strong> ${match[1]}</p>`;
+    html += `<p><strong>STATUS:</strong> ${match[2]}</p>`;
+    html += `<p><strong>NOTATKI:</strong> ${match[3]}</p>`;
 
-html += `<p style="color:#aaa; font-size:14px;">
-Ostatnia edycja: <strong>${match[5] || "-"}</strong> | ${match[4] || "-"}
-</p>`;
-    });
+    html += `<hr style="margin:20px 0; opacity:0.2;">`;
+
+    html += `<p style="color:#aaa; font-size:14px;">
+        Ostatnia edycja: <strong>${match[5] || "-"}</strong> | ${match[4] || "-"}
+    </p>`;
+
     resultBox.innerHTML = html;
+}
 
     // AUTO-UZUPEŁNIANIE
     if (adminToken) {
