@@ -180,7 +180,6 @@ h1 {
     
 <div class="container">
 
-    <!-- PODMIEŃ NA SWOJE LOGO -->
     <img src="https://dailymta.pl/FORUM/uploads/monthly_2024_01/logo512.png.b88e4caaa9beddd2d8365bfce33c4f2a.png" class="logo">
 
     <h1>Wyszukiwarka SID</h1>
@@ -241,7 +240,7 @@ async function adminLogin() {
         alert("Błąd logowania");
     }
 }
-// 💾 ZAPIS / EDYCJA
+// ZAPIS / EDYCJA
 async function saveUser() {
     if (!adminToken) {
         alert("Brak autoryzacji");
@@ -277,7 +276,7 @@ async function saveUser() {
     }
 }
 
-// 🔎 WYSZUKIWANIE SID (z Google Sheets CSV)
+// WYSZUKIWANIE SID
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQADbYEdftOlszRFS0BazxsoTfB_iUc0iwSlniqjpyKqpTF0k7WLCqVkytB4JXYLgEoCPH99QG_yn_D/pub?gid=0&single=true&output=csv";
 
 async function searchSID() {
@@ -296,16 +295,24 @@ async function searchSID() {
 
         const resultBox = document.getElementById("result");
 
-        if (match) {
-            let html = "<h3>Dane użytkownika:</h3>";
-            headers.forEach((header, i) => {
-                html += `<p><strong>${header}:</strong> ${match[i] || ""}</p>`;
-            });
-            resultBox.innerHTML = html;
-        } else {
-            resultBox.innerHTML = "❌ Nie znaleziono SID.";
-        }
+if (match) {
+    let html = "<h3>Dane użytkownika:</h3>";
+    headers.forEach((header, i) => {
+        html += `<p><strong>${header}:</strong> ${match[i] || ""}</p>`;
+    });
+    resultBox.innerHTML = html;
 
+    // AUTO-UZUPEŁNIANIE
+    if (adminToken) {
+        document.getElementById("newSID").value = match[0] || "";
+        document.getElementById("newNick").value = match[1] || "";
+        document.getElementById("newStatus").value = match[2] || "";
+        document.getElementById("newNotatki").value = match[3] || "";
+    }
+
+} else {
+    resultBox.innerHTML = "❌ Nie znaleziono SID.";
+}
     } catch (err) {
         console.error("SEARCH ERROR:", err);
         document.getElementById("result").innerHTML = "⚠ Błąd ładowania danych.";
