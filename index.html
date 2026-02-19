@@ -359,26 +359,19 @@ async function loadUserCount() {
         const response = await fetch(sheetURL + "&cache=" + Date.now());
         const text = await response.text();
 
-        function parseCSV(str) {
-    const rows = [];
-    const regex = /(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^,\n]+)|)(,|\n|$)/g;
-    let row = [];
-    let match;
+        // zwykłe liczenie wierszy
+        const rows = text
+            .split("\n")
+            .filter(row => row.trim() !== "");
 
-    while ((match = regex.exec(str))) {
-        if (match[1] !== undefined) {
-            row.push(match[1].replace(/""/g, '"'));
-        } else {
-            row.push(match[2] || "");
-        }
+        const count = rows.length - 1; // odejmujemy nagłówek
 
-        if (match[3] === "\n" || match[3] === "") {
-            rows.push(row);
-            row = [];
-        }
+        document.getElementById("userCount").textContent = count;
+
+    } catch (err) {
+        console.error("COUNT ERROR:", err);
+        document.getElementById("userCount").textContent = "Błąd";
     }
-
-    return rows;
 }
 
 const rows = parseCSV(text);
