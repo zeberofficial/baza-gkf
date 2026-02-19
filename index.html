@@ -309,7 +309,9 @@ async function searchSID() {
         const response = await fetch(`${API_URL}?action=get`);
         const data = await response.json();
 
-        const user = data.find(u => u.SID === sid);
+        const user = data.find(u =>
+    String(u.SID).replace(/\s+/g, "") === sid.replace(/\s+/g, "")
+);
         const resultBox = document.getElementById("result");
 
         if (user) {
