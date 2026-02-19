@@ -324,7 +324,9 @@ async function searchSID() {
             html += `<p><strong>SID:</strong> ${match[0]}</p>`;
             html += `<p><strong>NICK:</strong> ${match[1]}</p>`;
             html += `<p><strong>STATUS:</strong> ${match[2]}</p>`;
-            html += `<p><strong>NOTATKI:</strong> ${match[3]}</p>`;
+            const formattedNotes = (match[3] || "").replace(/\n/g, "<br>");
+
+html += `<p><strong>NOTATKI:</strong><br>${formattedNotes}</p>`;
 
             html += `<hr style="margin:20px 0; opacity:0.2;">`;
 
@@ -357,7 +359,29 @@ async function loadUserCount() {
         const response = await fetch(sheetURL + "&cache=" + Date.now());
         const text = await response.text();
 
-        const rows = text.split("\n").filter(r => r.trim() !== "");
+        function parseCSV(str) {
+    const rows = [];
+    const regex = /(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^,\n]+)|)(,|\n|$)/g;
+    let row = [];
+    let match;
+
+    while ((match = regex.exec(str))) {
+        if (match[1] !== undefined) {
+            row.push(match[1].replace(/""/g, '"'));
+        } else {
+            row.push(match[2] || "");
+        }
+
+        if (match[3] === "\n" || match[3] === "") {
+            rows.push(row);
+            row = [];
+        }
+    }
+
+    return rows;
+}
+
+const rows = parseCSV(text);
         const count = rows.length - 1; // odejmujemy nagłówek
 
         document.getElementById("userCount").textContent = count;
