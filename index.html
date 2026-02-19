@@ -324,13 +324,30 @@ async function searchSID() {
             html += `<p><strong>SID:</strong> ${user.SID}</p>`;
             html += `<p><strong>NICK:</strong> ${user.NICK}</p>`;
             html += `<p><strong>STATUS:</strong> ${user.STATUS}</p>`;
+
+            
+            
             html += `<p><strong>NOTATKI:</strong><br>${formattedNotes}</p>`;
 
             html += `<hr style="margin:20px 0; opacity:0.2;">`;
 
-            html += `<p style="color:#aaa; font-size:14px;">
-                Ostatnia edycja: <strong>${user.EDITED_BY || "-"}</strong> | ${user.LAST_EDIT || "-"}
-            </p>`;
+            let formattedDate = "-";
+
+if (user.LAST_EDIT) {
+    const date = new Date(user.LAST_EDIT);
+    formattedDate = date.toLocaleString("pl-PL", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+html += `<p style="color:#aaa; font-size:14px;">
+    Ostatnia edycja: <strong>${user.EDITED_BY || "-"}</strong> | ${formattedDate}
+</p>`;
+
 
             resultBox.innerHTML = html;
 
