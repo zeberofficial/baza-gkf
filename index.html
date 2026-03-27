@@ -41,9 +41,6 @@ h1 {
     border-radius: 12px;
     padding: 8px;
     backdrop-filter: blur(10px);
-}
-
-.search-box {
     margin-top: 10px;
 }
 
@@ -172,7 +169,7 @@ h1 {
 }
 
 .stats-box {
-    margin: 22px 0 22px 0;
+    margin: 22px 0;
     font-size: 16px;
     color: #ccc;
     text-align: center;
@@ -183,7 +180,6 @@ h1 {
     font-weight: bold;
     font-size: 18px;
 }
-
 </style>
 </head>
 
@@ -194,22 +190,23 @@ h1 {
     <input type="password" id="adminPass" placeholder="Hasło">
     <button onclick="adminLogin()">Zaloguj</button>
 </div>
-    
+
 <div class="container">
 
-<a href="https://gkfbaza.pl/">
-    <img src="https://dailymta.pl/FORUM/uploads/monthly_2024_01/logo512.png.b88e4caaa9beddd2d8365bfce33c4f2a.png" class="logo">
-</a>
+    <a href="https://gkfbaza.pl/">
+        <img src="https://dailymta.pl/FORUM/uploads/monthly_2024_01/logo512.png.b88e4caaa9beddd2d8365bfce33c4f2a.png" class="logo">
+    </a>
 
     <h1>Wyszukiwarka SID</h1>
     <div class="subtitle">Baza danych użytkowników na serwerze.</div>
+
     <div class="stats-box">
-    Wpisanych użytkowników:
-    <span id="userCount">Ładowanie...</span>
-</div>
+        Wpisanych użytkowników: <span id="userCount">Ładowanie...</span>
+    </div>
 
     <div class="search-box">
-        <input type="text" id="sidInput" placeholder="Wpisz SID">
+        <input type="text" id="sidInput" placeholder="Wpisz SID"
+               onkeydown="if(event.key==='Enter') searchSID()">
         <button onclick="searchSID()">SZUKAJ</button>
     </div>
 
@@ -217,19 +214,17 @@ h1 {
         Wyniki wyszukiwania pojawią się tutaj...
     </div>
 
-<div id="adminPanel" class="admin-panel" style="display:none;">
-    <h3>Panel Admina</h3>
-
-    <div class="admin-form">
-        <input type="text" id="newSID" placeholder="SID">
-        <input type="text" id="newNick" placeholder="Nick">
-        <input type="text" id="newStatus" placeholder="Status">
-        <textarea id="newNotatki" placeholder="Notatki"></textarea>
-
-        <button class="admin-save-btn" onclick="saveUser()">
-            Zapisz / Edytuj
-        </button>
+    <div id="adminPanel" class="admin-panel" style="display:none;">
+        <h3>Panel Admina</h3>
+        <div class="admin-form">
+            <input type="text" id="newSID" placeholder="SID">
+            <input type="text" id="newNick" placeholder="Nick">
+            <input type="text" id="newStatus" placeholder="Status">
+            <textarea id="newNotatki" placeholder="Notatki"></textarea>
+            <button class="admin-save-btn" onclick="saveUser()">Zapisz / Edytuj</button>
+        </div>
     </div>
+
 </div>
 
 <script>
@@ -238,10 +233,21 @@ let adminToken = null;
 
 const API_URL = "https://sid-api.zeberka-pasiasta69.workers.dev";
 
+// Zabezpieczenie przed XSS – sanitizacja tekstu przed wstawieniem do HTML
+function sanitize(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 async function adminLogin() {
     try {
         const login = document.getElementById("adminLogin").value;
-        const pass = document.getElementById("adminPass").value;
+        const pass  = document.getElementById("adminPass").value;
 
         const response = await fetch(
             `${API_URL}?action=login&login=${encodeURIComponent(login)}&password=${encodeURIComponent(pass)}`
@@ -269,9 +275,9 @@ async function saveUser() {
         return;
     }
 
-    const SID = document.getElementById("newSID").value;
-    const NICK = document.getElementById("newNick").value;
-    const STATUS = document.getElementById("newStatus").value;
+    const SID     = document.getElementById("newSID").value;
+    const NICK    = document.getElementById("newNick").value;
+    const STATUS  = document.getElementById("newStatus").value;
     const NOTATKI = document.getElementById("newNotatki").value;
 
     try {
@@ -299,8 +305,6 @@ async function saveUser() {
     }
 }
 
-const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQADbYEdftOlszRFS0BazxsoTfB_iUc0iwSlniqjpyKqpTF0k7WLCqVkytB4JXYLgEoCPH99QG_yn_D/pub?gid=0&single=true&output=csv";
-
 async function searchSID() {
     try {
         const sid = document.getElementById("sidInput").value.trim();
@@ -310,51 +314,43 @@ async function searchSID() {
         const data = await response.json();
 
         const user = data.find(u =>
-    String(u.SID).replace(/\s+/g, "") === sid.replace(/\s+/g, "")
-);
+            String(u.SID).replace(/\s+/g, "") === sid.replace(/\s+/g, "")
+        );
+
         const resultBox = document.getElementById("result");
 
         if (user) {
-
-            const formattedNotes = (user.NOTATKI || "")
-                .replace(/\n/g, "<br>");
+            const formattedNotes = sanitize(user.NOTATKI || "").replace(/\n/g, "<br>");
 
             let html = "<h3>Dane użytkownika:</h3>";
-
-            html += `<p><strong>SID:</strong> ${user.SID}</p>`;
-            html += `<p><strong>NICK:</strong> ${user.NICK}</p>`;
-            html += `<p><strong>STATUS:</strong> ${user.STATUS}</p>`;
-
-            
-            
+            html += `<p><strong>SID:</strong> ${sanitize(user.SID)}</p>`;
+            html += `<p><strong>NICK:</strong> ${sanitize(user.NICK)}</p>`;
+            html += `<p><strong>STATUS:</strong> ${sanitize(user.STATUS)}</p>`;
             html += `<p><strong>NOTATKI:</strong><br>${formattedNotes}</p>`;
-
             html += `<hr style="margin:20px 0; opacity:0.2;">`;
 
             let formattedDate = "-";
+            if (user.LAST_EDIT) {
+                const date = new Date(user.LAST_EDIT);
+                formattedDate = date.toLocaleString("pl-PL", {
+                    year:   "numeric",
+                    month:  "2-digit",
+                    day:    "2-digit",
+                    hour:   "2-digit",
+                    minute: "2-digit"
+                });
+            }
 
-if (user.LAST_EDIT) {
-    const date = new Date(user.LAST_EDIT);
-    formattedDate = date.toLocaleString("pl-PL", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit"
-    });
-}
-
-html += `<p style="color:#aaa; font-size:14px;">
-    Ostatnia edycja: <strong>${user.EDITED_BY || "-"}</strong> | ${formattedDate}
-</p>`;
-
+            html += `<p style="color:#aaa; font-size:14px;">
+                Ostatnia edycja: <strong>${sanitize(user.EDITED_BY || "-")}</strong> | ${formattedDate}
+            </p>`;
 
             resultBox.innerHTML = html;
 
             if (adminToken) {
-                document.getElementById("newSID").value = user.SID || "";
-                document.getElementById("newNick").value = user.NICK || "";
-                document.getElementById("newStatus").value = user.STATUS || "";
+                document.getElementById("newSID").value     = user.SID     || "";
+                document.getElementById("newNick").value    = user.NICK    || "";
+                document.getElementById("newStatus").value  = user.STATUS  || "";
                 document.getElementById("newNotatki").value = user.NOTATKI || "";
             }
 
@@ -370,17 +366,9 @@ html += `<p style="color:#aaa; font-size:14px;">
 
 async function loadUserCount() {
     try {
-        const response = await fetch(sheetURL + "&cache=" + Date.now());
-        const text = await response.text();
-
-        const rows = text
-            .split("\n")
-            .filter(row => row.trim() !== "");
-
-        const count = rows.length - 1;
-
-        document.getElementById("userCount").textContent = count;
-
+        const response = await fetch(`${API_URL}?action=get`);
+        const data = await response.json();
+        document.getElementById("userCount").textContent = Array.isArray(data) ? data.length : "?";
     } catch (err) {
         console.error("COUNT ERROR:", err);
         document.getElementById("userCount").textContent = "Błąd";
