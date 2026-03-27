@@ -78,38 +78,91 @@ h1 {
     text-align: left;
 }
 
+/* ── NOWY PASEK ADMINA ── */
 .admin-bar {
     position: fixed;
     top: 20px;
     right: 20px;
     display: flex;
+    align-items: center;
     gap: 8px;
-    background: rgba(0,0,0,0.4);
-    padding: 8px;
-    border-radius: 8px;
-    backdrop-filter: blur(10px);
+    background: rgba(10, 5, 20, 0.75);
+    padding: 10px 14px;
+    border-radius: 12px;
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 45, 85, 0.25);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    z-index: 999;
+}
+
+.admin-bar label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-right: 2px;
 }
 
 .admin-bar input {
-    padding: 6px;
-    border-radius: 4px;
-    border: none;
-    width: 100px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.07);
+    color: white;
+    font-size: 13px;
+    width: 95px;
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+.admin-bar input::placeholder {
+    color: #555;
+}
+
+.admin-bar input:focus {
+    border-color: rgba(255, 45, 85, 0.6);
+    box-shadow: 0 0 0 2px rgba(255, 45, 85, 0.15);
 }
 
 .admin-bar button {
     background: #ff2d55;
     border: none;
     color: white;
-    padding: 6px 10px;
-    border-radius: 4px;
+    padding: 7px 13px;
+    border-radius: 7px;
     cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    transition: background 0.2s, transform 0.15s;
 }
 
 .admin-bar button:hover {
     background: #e11d48;
+    transform: translateY(-1px);
 }
 
+/* status po zalogowaniu */
+.admin-bar .logged-badge {
+    font-size: 12px;
+    color: #4ade80;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.admin-bar .logged-badge::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background: #4ade80;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #4ade80;
+}
+
+/* ── PANEL ADMINA ── */
 .admin-panel {
     margin: 60px auto;
     width: 500px;
@@ -185,9 +238,11 @@ h1 {
 
 <body>
 
-<div class="admin-bar">
-    <input type="text" id="adminLogin" placeholder="Login">
-    <input type="password" id="adminPass" placeholder="Hasło">
+<div class="admin-bar" id="adminBar">
+    <label>Login</label>
+    <input type="text"     id="adminLogin" placeholder="nazwa">
+    <label>Hasło</label>
+    <input type="password" id="adminPass"  placeholder="••••••">
     <button onclick="adminLogin()">Zaloguj</button>
 </div>
 
@@ -217,10 +272,10 @@ h1 {
     <div id="adminPanel" class="admin-panel" style="display:none;">
         <h3>Panel Admina</h3>
         <div class="admin-form">
-            <input type="text" id="newSID" placeholder="SID">
-            <input type="text" id="newNick" placeholder="Nick">
-            <input type="text" id="newStatus" placeholder="Status">
-            <textarea id="newNotatki" placeholder="Notatki"></textarea>
+            <input type="text" id="newSID"     placeholder="SID">
+            <input type="text" id="newNick"    placeholder="Nick">
+            <input type="text" id="newStatus"  placeholder="Status">
+            <textarea          id="newNotatki" placeholder="Notatki"></textarea>
             <button class="admin-save-btn" onclick="saveUser()">Zapisz / Edytuj</button>
         </div>
     </div>
@@ -232,8 +287,10 @@ h1 {
 let adminToken = null;
 
 const API_URL = "https://sid-api.zeberka-pasiasta69.workers.dev";
+const STORAGE_LOGIN = "sid_admin_login";
+const STORAGE_PASS  = "sid_admin_pass";
 
-// Zabezpieczenie przed XSS – sanitizacja tekstu przed wstawieniem do HTML
+// ── Sanitizacja XSS ──
 function sanitize(str) {
     if (!str) return "";
     return String(str)
@@ -244,9 +301,26 @@ function sanitize(str) {
         .replace(/'/g, "&#039;");
 }
 
+// ── Pasek: zamień pola na zielony badge po zalogowaniu ──
+function showLoggedBadge(loginName) {
+    const bar = document.getElementById("adminBar");
+    bar.innerHTML = `
+        <span class="logged-badge">Admin: ${sanitize(loginName)}</span>
+        <button onclick="adminLogout()">Wyloguj</button>
+    `;
+}
+
+function adminLogout() {
+    adminToken = null;
+    localStorage.removeItem(STORAGE_LOGIN);
+    localStorage.removeItem(STORAGE_PASS);
+    document.getElementById("adminPanel").style.display = "none";
+    location.reload();
+}
+
 async function adminLogin() {
     try {
-        const login = document.getElementById("adminLogin").value;
+        const login = document.getElementById("adminLogin").value.trim();
         const pass  = document.getElementById("adminPass").value;
 
         const response = await fetch(
@@ -257,7 +331,13 @@ async function adminLogin() {
 
         if (result.token) {
             adminToken = result.token;
+
+            // Zapamiętaj dane w localStorage
+            localStorage.setItem(STORAGE_LOGIN, login);
+            localStorage.setItem(STORAGE_PASS,  pass);
+
             document.getElementById("adminPanel").style.display = "block";
+            showLoggedBadge(login);
             alert("Zalogowano jako admin");
         } else {
             alert("Błędny login lub hasło");
@@ -269,16 +349,41 @@ async function adminLogin() {
     }
 }
 
-async function saveUser() {
-    if (!adminToken) {
-        alert("Brak autoryzacji");
-        return;
+// ── Auto-login przy starcie strony ──
+async function tryAutoLogin() {
+    const login = localStorage.getItem(STORAGE_LOGIN);
+    const pass  = localStorage.getItem(STORAGE_PASS);
+    if (!login || !pass) return;
+
+    // Wstaw dane do inputów (na wypadek gdyby auto-login się nie powiódł)
+    document.getElementById("adminLogin").value = login;
+    document.getElementById("adminPass").value  = pass;
+
+    try {
+        const response = await fetch(
+            `${API_URL}?action=login&login=${encodeURIComponent(login)}&password=${encodeURIComponent(pass)}`
+        );
+        const result = await response.json();
+
+        if (result.token) {
+            adminToken = result.token;
+            document.getElementById("adminPanel").style.display = "block";
+            showLoggedBadge(login);
+        }
+        // jeśli token wygasł / hasło się zmieniło – nic nie robimy, pola już wypełnione
+    } catch (err) {
+        console.error("AUTO-LOGIN ERROR:", err);
     }
+}
+
+async function saveUser() {
+    if (!adminToken) { alert("Brak autoryzacji"); return; }
 
     const SID     = document.getElementById("newSID").value;
     const NICK    = document.getElementById("newNick").value;
     const STATUS  = document.getElementById("newStatus").value;
     const NOTATKI = document.getElementById("newNotatki").value;
+    const ADMIN   = localStorage.getItem(STORAGE_LOGIN) || "";
 
     try {
         const response = await fetch(
@@ -287,7 +392,7 @@ async function saveUser() {
             `&NICK=${encodeURIComponent(NICK)}` +
             `&STATUS=${encodeURIComponent(STATUS)}` +
             `&NOTATKI=${encodeURIComponent(NOTATKI)}` +
-            `&ADMIN=${encodeURIComponent(document.getElementById("adminLogin").value)}`
+            `&ADMIN=${encodeURIComponent(ADMIN)}`
         );
 
         const result = await response.json();
@@ -375,6 +480,8 @@ async function loadUserCount() {
     }
 }
 
+// ── Start ──
+tryAutoLogin();
 loadUserCount();
 
 </script>
