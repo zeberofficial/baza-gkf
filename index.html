@@ -2,295 +2,598 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wyszukiwarka SID</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --red:        #ff2d55;
+    --red-dark:   #c41f3e;
+    --red-glow:   rgba(255, 45, 85, 0.18);
+    --bg:         #07040f;
+    --bg2:        #0e0a1a;
+    --bg3:        #160f28;
+    --surface:    rgba(255,255,255,0.04);
+    --surface2:   rgba(255,255,255,0.07);
+    --border:     rgba(255,255,255,0.08);
+    --border2:    rgba(255,255,255,0.14);
+    --text:       #f0edf8;
+    --muted:      #7a7490;
+    --muted2:     #b0aac0;
+    --green:      #22c55e;
+    --mono:       'JetBrains Mono', monospace;
+    --sans:       'Inter', sans-serif;
+}
+
 html, body {
-    margin: 0;
-    padding: 0;
     min-height: 100vh;
-    font-family: 'Segoe UI', sans-serif;
-    background: radial-gradient(circle at top, #1a0f2e, #090014);
-    background-attachment: fixed;
-    color: white;
-    text-align: center;
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
 }
 
-.container {
-    padding-top: 80px;
+/* subtle grid texture */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,45,85,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,45,85,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
 }
 
-.logo {
-    width: 140px;
-    margin-bottom: 15px;
+body::after {
+    content: '';
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(255,45,85,0.10) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
 }
 
-h1 {
-    font-size: 32px;
-    margin: 10px 0 5px 0;
-}
-
-.subtitle {
-    color: #aaa;
-    margin-bottom: 10px;
-}
-
-.search-box {
-    display: inline-flex;
-    background: rgba(255,255,255,0.05);
-    border-radius: 12px;
-    padding: 8px;
-    backdrop-filter: blur(10px);
-    margin-top: 10px;
-}
-
-.search-box input {
-    border: none;
-    background: transparent;
-    padding: 12px;
-    color: white;
-    width: 250px;
-    outline: none;
-}
-
-.search-box button {
-    background: #ff2d55;
-    border: none;
-    padding: 12px 20px;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.search-box button:hover {
-    background: #e11d48;
-}
-
-.result-box {
-    margin: 40px auto;
-    width: 70%;
-    min-height: 250px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 15px;
-    padding: 20px;
-    backdrop-filter: blur(15px);
-    text-align: left;
-}
-
-/* ── NOWY PASEK ADMINA ── */
+/* ── ADMIN BAR ── */
 .admin-bar {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 16px;
+    right: 16px;
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(10, 5, 20, 0.75);
-    padding: 10px 14px;
-    border-radius: 12px;
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 45, 85, 0.25);
-    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-    z-index: 999;
+    background: rgba(10,6,20,0.90);
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border2);
+    z-index: 100;
+    backdrop-filter: blur(20px);
 }
 
-.admin-bar label {
+.admin-bar-label {
     font-size: 11px;
-    color: #888;
+    color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-right: 2px;
+    letter-spacing: 0.1em;
+    font-weight: 600;
 }
 
 .admin-bar input {
-    padding: 7px 10px;
-    border-radius: 7px;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.07);
-    color: white;
+    width: 90px;
+    padding: 6px 9px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: var(--sans);
     font-size: 13px;
-    width: 95px;
     outline: none;
-    transition: border 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.admin-bar input::placeholder {
-    color: #555;
-}
+.admin-bar input::placeholder { color: var(--muted); }
 
 .admin-bar input:focus {
-    border-color: rgba(255, 45, 85, 0.6);
-    box-shadow: 0 0 0 2px rgba(255, 45, 85, 0.15);
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px var(--red-glow);
 }
 
-.admin-bar button {
-    background: #ff2d55;
+.admin-bar .btn-login {
+    padding: 6px 12px;
+    background: var(--red);
+    color: #fff;
     border: none;
-    color: white;
-    padding: 7px 13px;
-    border-radius: 7px;
-    cursor: pointer;
+    border-radius: 6px;
+    font-family: var(--sans);
     font-size: 13px;
     font-weight: 600;
-    letter-spacing: 0.03em;
+    cursor: pointer;
     transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.02em;
 }
 
-.admin-bar button:hover {
-    background: #e11d48;
-    transform: translateY(-1px);
-}
+.admin-bar .btn-login:hover { background: var(--red-dark); transform: translateY(-1px); }
 
-/* status po zalogowaniu */
-.admin-bar .logged-badge {
-    font-size: 12px;
-    color: #4ade80;
-    font-weight: 600;
+.logged-badge {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--green);
 }
 
-.admin-bar .logged-badge::before {
-    content: '';
-    display: inline-block;
+.logged-badge .dot {
     width: 7px;
     height: 7px;
-    background: #4ade80;
+    background: var(--green);
     border-radius: 50%;
-    box-shadow: 0 0 6px #4ade80;
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s infinite;
 }
 
-/* ── PANEL ADMINA ── */
-.admin-panel {
-    margin: 60px auto;
-    width: 500px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 15px;
-    padding: 30px;
-    backdrop-filter: blur(15px);
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
 }
 
-.admin-panel h3 {
-    margin-bottom: 25px;
+.btn-logout {
+    padding: 5px 10px;
+    background: transparent;
+    color: var(--muted2);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.btn-logout:hover { color: var(--red); border-color: var(--red); }
+
+/* ── MAIN LAYOUT ── */
+.page {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 80px 24px 80px;
+}
+
+/* ── HEADER ── */
+.header {
     text-align: center;
+    margin-bottom: 48px;
 }
 
-.admin-form {
+.logo-wrap {
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.logo-wrap img {
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+    border: 1px solid var(--border2);
+}
+
+.site-title {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--text);
+}
+
+.site-title span { color: var(--red); }
+
+.site-sub {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 14px;
+    letter-spacing: 0.01em;
+}
+
+.stats-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 6px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 13px;
+    color: var(--muted2);
+}
+
+.stats-chip .count {
+    color: var(--red);
+    font-weight: 700;
+    font-size: 14px;
+    font-family: var(--mono);
+}
+
+/* ── SEARCH ── */
+.search-wrap {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.search-wrap input {
+    flex: 1;
+    padding: 14px 18px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: var(--mono);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-wrap input::placeholder { color: var(--muted); }
+
+.search-wrap input:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 4px var(--red-glow);
+}
+
+.btn-search {
+    padding: 14px 26px;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: background 0.2s, transform 0.15s;
+    white-space: nowrap;
+}
+
+.btn-search:hover { background: var(--red-dark); transform: translateY(-1px); }
+.btn-search:active { transform: translateY(0); }
+
+/* ── RESULT BOX ── */
+.result-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    min-height: 180px;
+    transition: border-color 0.3s;
+}
+
+.result-box.has-data {
+    border-color: rgba(255,45,85,0.25);
+}
+
+.result-placeholder {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-}
-
-.admin-form input,
-.admin-form textarea {
-    background: rgba(255,255,255,0.07);
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    color: white;
-    outline: none;
+    align-items: center;
+    justify-content: center;
+    height: 130px;
+    gap: 10px;
+    color: var(--muted);
     font-size: 14px;
 }
 
-.admin-form input:focus,
-.admin-form textarea:focus {
-    box-shadow: 0 0 8px #ff2d55;
-}
-
-.admin-form textarea {
-    resize: vertical;
-    min-height: 100px;
-    max-height: 200px;
-}
-
-.admin-save-btn {
-    background: #ff2d55;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.admin-save-btn:hover {
-    background: #e11d48;
-    transform: translateY(-2px);
-}
-
-.stats-box {
-    margin: 22px 0;
+.result-placeholder .icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 16px;
-    color: #ccc;
-    text-align: center;
 }
 
-.stats-box span {
-    color: #ff2d55;
-    font-weight: bold;
-    font-size: 18px;
+.result-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.result-header-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--green);
+}
+
+.result-header h3 {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted2);
+}
+
+.data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.data-field {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+
+.data-field.full { grid-column: 1 / -1; }
+
+.data-field .label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+}
+
+.data-field .value {
+    font-size: 14px;
+    color: var(--text);
+    font-family: var(--mono);
+    word-break: break-all;
+}
+
+.data-field .value.sid-val {
+    font-size: 13px;
+    color: var(--red);
+    font-weight: 600;
+}
+
+.notes-val {
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--muted2);
+    white-space: pre-wrap;
+}
+
+.result-footer {
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.result-footer strong { color: var(--muted2); font-weight: 500; }
+
+.not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 130px;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.not-found .nf-icon {
+    font-size: 28px;
+    opacity: 0.5;
+}
+
+/* ── ADMIN PANEL ── */
+.admin-section {
+    margin-top: 32px;
+    background: var(--bg2);
+    border: 1px solid rgba(255,45,85,0.2);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.admin-section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,45,85,0.05);
+}
+
+.admin-section-header .tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--red);
+    background: rgba(255,45,85,0.12);
+    padding: 3px 8px;
+    border-radius: 5px;
+}
+
+.admin-section-header h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted2);
+}
+
+.admin-form-inner {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+
+.form-group label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 11px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder { color: var(--muted); font-family: var(--sans); }
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px var(--red-glow);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 90px;
+    font-family: var(--sans);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.btn-save {
+    grid-column: 1 / -1;
+    padding: 13px;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: var(--sans);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.btn-save:hover { background: var(--red-dark); transform: translateY(-1px); }
+
+/* ── ERROR / LOADING STATES ── */
+.state-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: rgba(255,45,85,0.07);
+    border: 1px solid rgba(255,45,85,0.2);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--red);
+    margin-top: 12px;
 }
 </style>
 </head>
-
 <body>
 
+<!-- ADMIN BAR -->
 <div class="admin-bar" id="adminBar">
-    <label>Login</label>
-    <input type="text"     id="adminLogin" placeholder="nazwa">
-    <label>Hasło</label>
-    <input type="password" id="adminPass"  placeholder="••••••">
-    <button onclick="adminLogin()">Zaloguj</button>
+    <span class="admin-bar-label">Admin</span>
+    <input type="text"     id="adminLogin" placeholder="login">
+    <input type="password" id="adminPass"  placeholder="hasło">
+    <button class="btn-login" onclick="adminLogin()">Zaloguj</button>
 </div>
 
-<div class="container">
+<!-- PAGE -->
+<div class="page">
 
-    <a href="https://gkfbaza.pl/">
-        <img src="https://dailymta.pl/FORUM/uploads/monthly_2024_01/logo512.png.b88e4caaa9beddd2d8365bfce33c4f2a.png" class="logo">
-    </a>
-
-    <h1>Wyszukiwarka SID</h1>
-    <div class="subtitle">Baza danych użytkowników na serwerze.</div>
-
-    <div class="stats-box">
-        Wpisanych użytkowników: <span id="userCount">Ładowanie...</span>
-    </div>
-
-    <div class="search-box">
-        <input type="text" id="sidInput" placeholder="Wpisz SID"
-               onkeydown="if(event.key==='Enter') searchSID()">
-        <button onclick="searchSID()">SZUKAJ</button>
-    </div>
-
-    <div class="result-box" id="result">
-        Wyniki wyszukiwania pojawią się tutaj...
-    </div>
-
-    <div id="adminPanel" class="admin-panel" style="display:none;">
-        <h3>Panel Admina</h3>
-        <div class="admin-form">
-            <input type="text" id="newSID"     placeholder="SID">
-            <input type="text" id="newNick"    placeholder="Nick">
-            <input type="text" id="newStatus"  placeholder="Status">
-            <textarea          id="newNotatki" placeholder="Notatki"></textarea>
-            <button class="admin-save-btn" onclick="saveUser()">Zapisz / Edytuj</button>
+    <!-- HEADER -->
+    <div class="header">
+        <a href="https://gkfbaza.pl/" class="logo-wrap">
+            <img src="https://dailymta.pl/FORUM/uploads/monthly_2024_01/logo512.png.b88e4caaa9beddd2d8365bfce33c4f2a.png" alt="Logo">
+        </a>
+        <div class="site-title">Wyszukiwarka <span>SID</span></div>
+        <div class="site-sub">Baza danych użytkowników serwera</div>
+        <div class="stats-chip">
+            Zarejestrowanych graczy:&nbsp;<span class="count" id="userCount">—</span>
         </div>
     </div>
 
-</div>
+    <!-- SEARCH -->
+    <div class="search-wrap">
+        <input type="text" id="sidInput" placeholder="Wpisz SID gracza..."
+               onkeydown="if(event.key==='Enter') searchSID()">
+        <button class="btn-search" onclick="searchSID()">SZUKAJ</button>
+    </div>
+
+    <!-- RESULT -->
+    <div class="result-box" id="result">
+        <div class="result-placeholder">
+            <div class="icon">🔍</div>
+            Wyniki wyszukiwania pojawią się tutaj
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div class="admin-section" id="adminPanel" style="display:none;">
+        <div class="admin-section-header">
+            <span class="tag">Admin</span>
+            <h3>Edycja rekordu</h3>
+        </div>
+        <div class="admin-form-inner">
+            <div class="form-group">
+                <label>SID</label>
+                <input type="text" id="newSID" placeholder="np. 12345678">
+            </div>
+            <div class="form-group">
+                <label>Nick</label>
+                <input type="text" id="newNick" placeholder="nick gracza">
+            </div>
+            <div class="form-group full">
+                <label>Status</label>
+                <input type="text" id="newStatus" placeholder="np. Aktywny / Zbanowany">
+            </div>
+            <div class="form-group full">
+                <label>Notatki</label>
+                <textarea id="newNotatki" placeholder="Dodatkowe informacje..."></textarea>
+            </div>
+            <button class="btn-save" onclick="saveUser()">Zapisz / Zaktualizuj rekord</button>
+        </div>
+    </div>
+
+</div><!-- /page -->
 
 <script>
-
 let adminToken = null;
 
-const API_URL = "https://sid-api.zeberka-pasiasta69.workers.dev";
-const STORAGE_LOGIN = "sid_admin_login";
-const STORAGE_PASS  = "sid_admin_pass";
+const API_URL      = "https://sid-api.zeberka-pasiasta69.workers.dev";
+const LS_LOGIN     = "sid_admin_login";
+const LS_PASS      = "sid_admin_pass";
 
-// ── Sanitizacja XSS ──
 function sanitize(str) {
     if (!str) return "";
     return String(str)
@@ -301,81 +604,69 @@ function sanitize(str) {
         .replace(/'/g, "&#039;");
 }
 
-// ── Pasek: zamień pola na zielony badge po zalogowaniu ──
-function showLoggedBadge(loginName) {
-    const bar = document.getElementById("adminBar");
-    bar.innerHTML = `
-        <span class="logged-badge">Admin: ${sanitize(loginName)}</span>
-        <button onclick="adminLogout()">Wyloguj</button>
+/* ── Admin bar ── */
+function showLoggedBadge(name) {
+    document.getElementById("adminBar").innerHTML = `
+        <span class="logged-badge">
+            <span class="dot"></span>
+            ${sanitize(name)}
+        </span>
+        <button class="btn-logout" onclick="adminLogout()">Wyloguj</button>
     `;
 }
 
 function adminLogout() {
     adminToken = null;
-    localStorage.removeItem(STORAGE_LOGIN);
-    localStorage.removeItem(STORAGE_PASS);
+    localStorage.removeItem(LS_LOGIN);
+    localStorage.removeItem(LS_PASS);
     document.getElementById("adminPanel").style.display = "none";
     location.reload();
 }
 
 async function adminLogin() {
+    const login = document.getElementById("adminLogin").value.trim();
+    const pass  = document.getElementById("adminPass").value;
     try {
-        const login = document.getElementById("adminLogin").value.trim();
-        const pass  = document.getElementById("adminPass").value;
-
-        const response = await fetch(
-            `${API_URL}?action=login&login=${encodeURIComponent(login)}&password=${encodeURIComponent(pass)}`
-        );
-
-        const result = await response.json();
-
+        const res    = await fetch(`${API_URL}?action=login&login=${encodeURIComponent(login)}&password=${encodeURIComponent(pass)}`);
+        const result = await res.json();
         if (result.token) {
             adminToken = result.token;
-
-            // Zapamiętaj dane w localStorage
-            localStorage.setItem(STORAGE_LOGIN, login);
-            localStorage.setItem(STORAGE_PASS,  pass);
-
+            localStorage.setItem(LS_LOGIN, login);
+            localStorage.setItem(LS_PASS,  pass);
             document.getElementById("adminPanel").style.display = "block";
             showLoggedBadge(login);
             alert("Zalogowano jako admin");
         } else {
             alert("Błędny login lub hasło");
         }
-
     } catch (err) {
         console.error("LOGIN ERROR:", err);
         alert("Błąd logowania");
     }
 }
 
-// ── Auto-login przy starcie strony ──
 async function tryAutoLogin() {
-    const login = localStorage.getItem(STORAGE_LOGIN);
-    const pass  = localStorage.getItem(STORAGE_PASS);
+    const login = localStorage.getItem(LS_LOGIN);
+    const pass  = localStorage.getItem(LS_PASS);
     if (!login || !pass) return;
 
-    // Wstaw dane do inputów (na wypadek gdyby auto-login się nie powiódł)
     document.getElementById("adminLogin").value = login;
     document.getElementById("adminPass").value  = pass;
 
     try {
-        const response = await fetch(
-            `${API_URL}?action=login&login=${encodeURIComponent(login)}&password=${encodeURIComponent(pass)}`
-        );
-        const result = await response.json();
-
+        const res    = await fetch(`${API_URL}?action=login&login=${encodeURIComponent(login)}&password=${encodeURIComponent(pass)}`);
+        const result = await res.json();
         if (result.token) {
             adminToken = result.token;
             document.getElementById("adminPanel").style.display = "block";
             showLoggedBadge(login);
         }
-        // jeśli token wygasł / hasło się zmieniło – nic nie robimy, pola już wypełnione
     } catch (err) {
         console.error("AUTO-LOGIN ERROR:", err);
     }
 }
 
+/* ── Save ── */
 async function saveUser() {
     if (!adminToken) { alert("Brak autoryzacji"); return; }
 
@@ -383,74 +674,81 @@ async function saveUser() {
     const NICK    = document.getElementById("newNick").value;
     const STATUS  = document.getElementById("newStatus").value;
     const NOTATKI = document.getElementById("newNotatki").value;
-    const ADMIN   = localStorage.getItem(STORAGE_LOGIN) || "";
+    const ADMIN   = localStorage.getItem(LS_LOGIN) || "";
 
     try {
-        const response = await fetch(
-            `${API_URL}?action=save&token=${adminToken}` +
+        const res    = await fetch(`${API_URL}?action=save&token=${adminToken}` +
             `&SID=${encodeURIComponent(SID)}` +
             `&NICK=${encodeURIComponent(NICK)}` +
             `&STATUS=${encodeURIComponent(STATUS)}` +
             `&NOTATKI=${encodeURIComponent(NOTATKI)}` +
-            `&ADMIN=${encodeURIComponent(ADMIN)}`
-        );
-
-        const result = await response.json();
-
-        if (result.success) {
-            alert("Zapisano!");
-            searchSID();
-        } else {
-            alert("Błąd zapisu");
-        }
-
+            `&ADMIN=${encodeURIComponent(ADMIN)}`);
+        const result = await res.json();
+        if (result.success) { alert("Zapisano!"); searchSID(); }
+        else                { alert("Błąd zapisu"); }
     } catch (err) {
         console.error("SAVE ERROR:", err);
         alert("Błąd zapisu");
     }
 }
 
+/* ── Search ── */
 async function searchSID() {
-    try {
-        const sid = document.getElementById("sidInput").value.trim();
-        if (!sid) return;
+    const sid = document.getElementById("sidInput").value.trim();
+    if (!sid) return;
 
-        const response = await fetch(`${API_URL}?action=get`);
-        const data = await response.json();
+    const box = document.getElementById("result");
+    box.classList.remove("has-data");
+    box.innerHTML = `<div class="result-placeholder"><div class="icon">⏳</div>Szukam...</div>`;
+
+    try {
+        const res  = await fetch(`${API_URL}?action=get`);
+        const data = await res.json();
 
         const user = data.find(u =>
             String(u.SID).replace(/\s+/g, "") === sid.replace(/\s+/g, "")
         );
 
-        const resultBox = document.getElementById("result");
-
         if (user) {
-            const formattedNotes = sanitize(user.NOTATKI || "").replace(/\n/g, "<br>");
+            box.classList.add("has-data");
 
-            let html = "<h3>Dane użytkownika:</h3>";
-            html += `<p><strong>SID:</strong> ${sanitize(user.SID)}</p>`;
-            html += `<p><strong>NICK:</strong> ${sanitize(user.NICK)}</p>`;
-            html += `<p><strong>STATUS:</strong> ${sanitize(user.STATUS)}</p>`;
-            html += `<p><strong>NOTATKI:</strong><br>${formattedNotes}</p>`;
-            html += `<hr style="margin:20px 0; opacity:0.2;">`;
-
-            let formattedDate = "-";
+            let formattedDate = "—";
             if (user.LAST_EDIT) {
-                const date = new Date(user.LAST_EDIT);
-                formattedDate = date.toLocaleString("pl-PL", {
-                    year:   "numeric",
-                    month:  "2-digit",
-                    day:    "2-digit",
-                    hour:   "2-digit",
-                    minute: "2-digit"
+                formattedDate = new Date(user.LAST_EDIT).toLocaleString("pl-PL", {
+                    year: "numeric", month: "2-digit", day: "2-digit",
+                    hour: "2-digit", minute: "2-digit"
                 });
             }
 
-            html += `<p style="color:#aaa; font-size:14px;">
-                Ostatnia edycja: <strong>${sanitize(user.EDITED_BY || "-")}</strong> | ${formattedDate}
-            </p>`;
+            const notesHtml = sanitize(user.NOTATKI || "—").replace(/\n/g, "<br>");
 
-            resultBox.innerHTML = html;
+            box.innerHTML = `
+                <div class="result-header">
+                    <span class="result-header-dot"></span>
+                    <h3>Dane użytkownika</h3>
+                </div>
+                <div class="data-grid">
+                    <div class="data-field">
+                        <div class="label">SID</div>
+                        <div class="value sid-val">${sanitize(user.SID)}</div>
+                    </div>
+                    <div class="data-field">
+                        <div class="label">Nick</div>
+                        <div class="value">${sanitize(user.NICK || "—")}</div>
+                    </div>
+                    <div class="data-field full">
+                        <div class="label">Status</div>
+                        <div class="value">${sanitize(user.STATUS || "—")}</div>
+                    </div>
+                    <div class="data-field full">
+                        <div class="label">Notatki</div>
+                        <div class="notes-val">${notesHtml}</div>
+                    </div>
+                </div>
+                <div class="result-footer">
+                    Ostatnia edycja przez&nbsp;<strong>${sanitize(user.EDITED_BY || "—")}</strong>&nbsp;·&nbsp;${formattedDate}
+                </div>
+            `;
 
             if (adminToken) {
                 document.getElementById("newSID").value     = user.SID     || "";
@@ -458,33 +756,32 @@ async function searchSID() {
                 document.getElementById("newStatus").value  = user.STATUS  || "";
                 document.getElementById("newNotatki").value = user.NOTATKI || "";
             }
-
         } else {
-            resultBox.innerHTML = "❌ Nie znaleziono SID.";
+            box.innerHTML = `
+                <div class="not-found">
+                    <span class="nf-icon">✕</span>
+                    Nie znaleziono gracza o podanym SID
+                </div>`;
         }
-
     } catch (err) {
         console.error("SEARCH ERROR:", err);
-        document.getElementById("result").innerHTML = "⚠ Błąd ładowania danych.";
+        box.innerHTML = `<div class="state-error">⚠ Błąd ładowania danych z serwera</div>`;
     }
 }
 
+/* ── User count ── */
 async function loadUserCount() {
     try {
-        const response = await fetch(`${API_URL}?action=get`);
-        const data = await response.json();
+        const res  = await fetch(`${API_URL}?action=get`);
+        const data = await res.json();
         document.getElementById("userCount").textContent = Array.isArray(data) ? data.length : "?";
-    } catch (err) {
-        console.error("COUNT ERROR:", err);
-        document.getElementById("userCount").textContent = "Błąd";
+    } catch {
+        document.getElementById("userCount").textContent = "—";
     }
 }
 
-// ── Start ──
 tryAutoLogin();
 loadUserCount();
-
 </script>
-
 </body>
 </html>
