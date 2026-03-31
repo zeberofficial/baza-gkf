@@ -3,29 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wyszukiwarka SID</title>
+<title>GKF — DailyRPG</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-    --red:        #ff2d55;
-    --red-dark:   #c41f3e;
-    --red-glow:   rgba(255, 45, 85, 0.18);
-    --bg:         #07040f;
-    --bg2:        #0e0a1a;
-    --bg3:        #160f28;
-    --surface:    rgba(255,255,255,0.04);
-    --surface2:   rgba(255,255,255,0.07);
-    --border:     rgba(255,255,255,0.08);
-    --border2:    rgba(255,255,255,0.14);
-    --text:       #f0edf8;
-    --muted:      #7a7490;
-    --muted2:     #b0aac0;
-    --green:      #22c55e;
-    --mono:       'JetBrains Mono', monospace;
-    --sans:       'Inter', sans-serif;
+    --red:      #ff2d55;
+    --red-dark: #c41f3e;
+    --red-glow: rgba(255, 45, 85, 0.18);
+    --bg:       #07040f;
+    --bg2:      #0e0a1a;
+    --bg3:      #160f28;
+    --surface:  rgba(255,255,255,0.04);
+    --surface2: rgba(255,255,255,0.07);
+    --border:   rgba(255,255,255,0.08);
+    --border2:  rgba(255,255,255,0.14);
+    --text:     #f0edf8;
+    --muted:    #7a7490;
+    --muted2:   #b0aac0;
+    --green:    #22c55e;
+    --sans:     'Inter', sans-serif;
+    --mono:     'JetBrains Mono', monospace;
 }
 
 html, body {
@@ -37,7 +37,6 @@ html, body {
     line-height: 1.6;
 }
 
-/* subtle grid texture */
 body::before {
     content: '';
     position: fixed;
@@ -63,20 +62,53 @@ body::after {
     z-index: 0;
 }
 
-/* ── ADMIN BAR ── */
-.admin-bar {
+/* ════════════════════════════
+   TOP BAR
+   ════════════════════════════ */
+.topbar {
     position: fixed;
     top: 16px;
-    right: 16px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(10,6,20,0.90);
-    padding: 8px 12px;
-    border-radius: 10px;
+    gap: 6px;
+    background: rgba(10,6,20,0.92);
+    padding: 7px 10px;
+    border-radius: 12px;
     border: 1px solid var(--border2);
     z-index: 100;
     backdrop-filter: blur(20px);
+    white-space: nowrap;
+}
+
+.topbar-sep {
+    width: 1px;
+    height: 18px;
+    background: var(--border2);
+    flex-shrink: 0;
+}
+
+.tab-btn {
+    padding: 6px 14px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted2);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: background 0.2s, color 0.2s;
+}
+
+.tab-btn:hover { background: var(--surface2); color: var(--text); }
+.tab-btn.active { background: var(--red); color: #fff; font-weight: 600; }
+
+.admin-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
 }
 
 .admin-bar-label {
@@ -88,8 +120,8 @@ body::after {
 }
 
 .admin-bar input {
-    width: 90px;
-    padding: 6px 9px;
+    width: 88px;
+    padding: 5px 9px;
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 6px;
@@ -107,8 +139,8 @@ body::after {
     box-shadow: 0 0 0 3px var(--red-glow);
 }
 
-.admin-bar .btn-login {
-    padding: 6px 12px;
+.btn-login {
+    padding: 5px 11px;
     background: var(--red);
     color: #fff;
     border: none;
@@ -118,10 +150,9 @@ body::after {
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s, transform 0.15s;
-    letter-spacing: 0.02em;
 }
 
-.admin-bar .btn-login:hover { background: var(--red-dark); transform: translateY(-1px); }
+.btn-login:hover { background: var(--red-dark); transform: translateY(-1px); }
 
 .logged-badge {
     display: flex;
@@ -160,25 +191,26 @@ body::after {
 
 .btn-logout:hover { color: var(--red); border-color: var(--red); }
 
-/* ── MAIN LAYOUT ── */
+/* ════════════════════════════
+   PAGE & VIEWS
+   ════════════════════════════ */
 .page {
     position: relative;
     z-index: 1;
-    max-width: 760px;
+    max-width: 780px;
     margin: 0 auto;
-    padding: 80px 24px 80px;
+    padding: 90px 24px 80px;
 }
 
-/* ── HEADER ── */
+.view { display: none; }
+.view.active { display: block; }
+
 .header {
     text-align: center;
     margin-bottom: 48px;
 }
 
-.logo-wrap {
-    display: inline-block;
-    margin-bottom: 20px;
-}
+.logo-wrap { display: inline-block; margin-bottom: 20px; }
 
 .logo-wrap img {
     width: 110px;
@@ -200,9 +232,11 @@ body::after {
     margin-top: 8px;
     color: var(--muted);
     font-size: 14px;
-    letter-spacing: 0.01em;
 }
 
+/* ════════════════════════════
+   WYSZUKIWARKA
+   ════════════════════════════ */
 .stats-chip {
     display: inline-flex;
     align-items: center;
@@ -223,7 +257,6 @@ body::after {
     font-family: var(--mono);
 }
 
-/* ── SEARCH ── */
 .search-wrap {
     display: flex;
     gap: 10px;
@@ -244,11 +277,7 @@ body::after {
 }
 
 .search-wrap input::placeholder { color: var(--muted); }
-
-.search-wrap input:focus {
-    border-color: var(--red);
-    box-shadow: 0 0 0 4px var(--red-glow);
-}
+.search-wrap input:focus { border-color: var(--red); box-shadow: 0 0 0 4px var(--red-glow); }
 
 .btn-search {
     padding: 14px 26px;
@@ -268,7 +297,6 @@ body::after {
 .btn-search:hover { background: var(--red-dark); transform: translateY(-1px); }
 .btn-search:active { transform: translateY(0); }
 
-/* ── RESULT BOX ── */
 .result-box {
     background: var(--bg2);
     border: 1px solid var(--border);
@@ -278,9 +306,7 @@ body::after {
     transition: border-color 0.3s;
 }
 
-.result-box.has-data {
-    border-color: rgba(255,45,85,0.25);
-}
+.result-box.has-data { border-color: rgba(255,45,85,0.25); }
 
 .result-placeholder {
     display: flex;
@@ -305,12 +331,7 @@ body::after {
     font-size: 16px;
 }
 
-.result-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 22px;
-}
+.result-header { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
 
 .result-header-dot {
     width: 8px;
@@ -353,26 +374,10 @@ body::after {
     margin-bottom: 5px;
 }
 
-.data-field .value {
-    font-size: 14px;
-    color: var(--text);
-    font-family: var(--mono);
-    word-break: break-all;
-}
+.data-field .value { font-size: 14px; color: var(--text); font-family: var(--mono); word-break: break-all; }
+.data-field .value.sid-val { font-size: 13px; color: var(--red); font-weight: 600; }
 
-.data-field .value.sid-val {
-    font-size: 13px;
-    color: var(--red);
-    font-weight: 600;
-}
-
-.notes-val {
-    font-family: var(--sans);
-    font-size: 14px;
-    line-height: 1.7;
-    color: var(--muted2);
-    white-space: pre-wrap;
-}
+.notes-val { font-family: var(--sans); font-size: 14px; line-height: 1.7; color: var(--muted2); white-space: pre-wrap; }
 
 .result-footer {
     padding-top: 14px;
@@ -397,12 +402,8 @@ body::after {
     font-size: 14px;
 }
 
-.not-found .nf-icon {
-    font-size: 28px;
-    opacity: 0.5;
-}
+.not-found .nf-icon { font-size: 28px; opacity: 0.5; }
 
-/* ── ADMIN PANEL ── */
 .admin-section {
     margin-top: 32px;
     background: var(--bg2);
@@ -431,11 +432,7 @@ body::after {
     border-radius: 5px;
 }
 
-.admin-section-header h3 {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--muted2);
-}
+.admin-section-header h3 { font-size: 14px; font-weight: 600; color: var(--muted2); }
 
 .admin-form-inner {
     padding: 24px;
@@ -472,18 +469,9 @@ body::after {
 .form-group textarea::placeholder { color: var(--muted); font-family: var(--sans); }
 
 .form-group input:focus,
-.form-group textarea:focus {
-    border-color: var(--red);
-    box-shadow: 0 0 0 3px var(--red-glow);
-}
+.form-group textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px var(--red-glow); }
 
-.form-group textarea {
-    resize: vertical;
-    min-height: 90px;
-    font-family: var(--sans);
-    font-size: 13px;
-    line-height: 1.6;
-}
+.form-group textarea { resize: vertical; min-height: 90px; font-family: var(--sans); font-size: 13px; line-height: 1.6; }
 
 .btn-save {
     grid-column: 1 / -1;
@@ -502,7 +490,6 @@ body::after {
 
 .btn-save:hover { background: var(--red-dark); transform: translateY(-1px); }
 
-/* ── ERROR / LOADING STATES ── */
 .state-error {
     display: flex;
     align-items: center;
@@ -515,95 +502,493 @@ body::after {
     color: var(--red);
     margin-top: 12px;
 }
+
+/* ════════════════════════════
+   REGULAMIN
+   ════════════════════════════ */
+.meta-chips {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 12px;
+    color: var(--muted2);
+}
+
+.chip .cdot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
+
+.toc {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 32px;
+}
+
+.toc-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+}
+
+.toc-list { display: flex; flex-direction: column; gap: 3px; }
+
+.toc-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    text-decoration: none;
+    color: var(--muted2);
+    font-size: 13px;
+    transition: background 0.15s, color 0.15s;
+    cursor: pointer;
+}
+
+.toc-item:hover { background: var(--surface2); color: var(--text); }
+.toc-num { font-family: var(--mono); font-size: 11px; color: var(--red); min-width: 22px; }
+
+.reg-section {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    scroll-margin-top: 90px;
+}
+
+.reg-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+}
+
+.reg-num {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--red);
+    background: rgba(255,45,85,0.1);
+    padding: 4px 9px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.reg-title { font-size: 15px; font-weight: 600; color: var(--text); }
+
+.reg-body { padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+
+.prose { font-size: 14px; color: var(--muted2); line-height: 1.75; }
+.prose strong { color: var(--text); font-weight: 600; }
+
+.bullet-list { display: flex; flex-direction: column; gap: 6px; }
+
+.bullet-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--muted2);
+    line-height: 1.6;
+}
+
+.bullet-item::before {
+    content: '';
+    flex-shrink: 0;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--red);
+    margin-top: 8px;
+}
+
+.hierarchy { display: flex; flex-direction: column; gap: 6px; }
+
+.hierarchy-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+}
+
+.rank-badge { font-size: 11px; font-weight: 700; font-family: var(--mono); letter-spacing: 0.06em; padding: 3px 9px; border-radius: 5px; white-space: nowrap; }
+.rank-1 { background: rgba(255,45,85,0.15); color: var(--red); }
+.rank-2 { background: rgba(255,45,85,0.08); color: #ff7494; }
+.rank-3 { background: var(--surface); color: var(--muted2); }
+.rank-name { font-size: 14px; color: var(--text); font-weight: 500; }
+
+.subsection { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+
+.subsection-header {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.subsection-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+
+.rule-item {
+    display: flex;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.rule-num { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--red); padding-top: 1px; min-width: 20px; }
+.rule-text { color: var(--muted2); }
+.rule-text strong { color: var(--text); }
+
+.note-box {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(255,45,85,0.06);
+    border: 1px solid rgba(255,45,85,0.2);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--muted2);
+    line-height: 1.6;
+}
+
+.note-icon { font-size: 15px; flex-shrink: 0; padding-top: 1px; }
+.note-box strong { color: var(--red); }
+
+.reg-footer {
+    text-align: center;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.reg-footer span { color: var(--red); }
 </style>
 </head>
 <body>
 
-<!-- ADMIN BAR -->
-<div class="admin-bar" id="adminBar">
-    <span class="admin-bar-label">Admin</span>
-    <input type="text"     id="adminLogin" placeholder="login">
-    <input type="password" id="adminPass"  placeholder="hasło">
-    <button class="btn-login" onclick="adminLogin()">Zaloguj</button>
+<!-- TOP BAR -->
+<div class="topbar">
+    <button class="tab-btn active" id="tab-sid"       onclick="switchTab('sid')">🔍 Wyszukiwarka SID</button>
+    <button class="tab-btn"        id="tab-regulamin"  onclick="switchTab('regulamin')">📋 Regulamin GKF</button>
+    <div class="topbar-sep"></div>
+    <div class="admin-bar" id="adminBar">
+        <span class="admin-bar-label">Admin</span>
+        <input type="text"     id="adminLogin" placeholder="login">
+        <input type="password" id="adminPass"  placeholder="hasło">
+        <button class="btn-login" onclick="adminLogin()">Zaloguj</button>
+    </div>
 </div>
 
-<!-- PAGE -->
 <div class="page">
 
-    <!-- HEADER -->
-    <div class="header">
-        <a href="https://gkfbaza.pl/" class="logo-wrap">
-            <img src="https://dailymta.pl/FORUM/uploads/monthly_2024_01/logo512.png.b88e4caaa9beddd2d8365bfce33c4f2a.png" alt="Logo">
-        </a>
-        <div class="site-title">Wyszukiwarka <span>SID</span></div>
-        <div class="site-sub">Baza danych użytkowników serwera</div>
-        <div class="stats-chip">
-            Zarejestrowanych graczy:&nbsp;<span class="count" id="userCount">—</span>
+    <!-- ══════════ WYSZUKIWARKA ══════════ -->
+    <div class="view active" id="view-sid">
+
+        <div class="header">
+            <a href="https://gkfbaza.pl/" class="logo-wrap">
+                <img src="https://dailymta.pl/FORUM/uploads/monthly_2024_01/logo512.png.b88e4caaa9beddd2d8365bfce33c4f2a.png" alt="Logo">
+            </a>
+            <div class="site-title">Wyszukiwarka <span>SID</span></div>
+            <div class="site-sub">Baza danych użytkowników serwera</div>
+            <div class="stats-chip">
+                Zarejestrowanych graczy:&nbsp;<span class="count" id="userCount">—</span>
+            </div>
         </div>
+
+        <div class="search-wrap">
+            <input type="text" id="sidInput" placeholder="Wpisz SID gracza..."
+                   onkeydown="if(event.key==='Enter') searchSID()">
+            <button class="btn-search" onclick="searchSID()">SZUKAJ</button>
+        </div>
+
+        <div class="result-box" id="result">
+            <div class="result-placeholder">
+                <div class="icon">🔍</div>
+                Wyniki wyszukiwania pojawią się tutaj
+            </div>
+        </div>
+
+        <div class="admin-section" id="adminPanel" style="display:none;">
+            <div class="admin-section-header">
+                <span class="tag">Admin</span>
+                <h3>Edycja rekordu</h3>
+            </div>
+            <div class="admin-form-inner">
+                <div class="form-group">
+                    <label>SID</label>
+                    <input type="text" id="newSID" placeholder="np. 12345678">
+                </div>
+                <div class="form-group">
+                    <label>Nick</label>
+                    <input type="text" id="newNick" placeholder="nick gracza">
+                </div>
+                <div class="form-group full">
+                    <label>Status</label>
+                    <input type="text" id="newStatus" placeholder="np. Aktywny / Zbanowany">
+                </div>
+                <div class="form-group full">
+                    <label>Notatki</label>
+                    <textarea id="newNotatki" placeholder="Dodatkowe informacje..."></textarea>
+                </div>
+                <button class="btn-save" onclick="saveUser()">Zapisz / Zaktualizuj rekord</button>
+            </div>
+        </div>
+
     </div>
 
-    <!-- SEARCH -->
-    <div class="search-wrap">
-        <input type="text" id="sidInput" placeholder="Wpisz SID gracza..."
-               onkeydown="if(event.key==='Enter') searchSID()">
-        <button class="btn-search" onclick="searchSID()">SZUKAJ</button>
-    </div>
+    <!-- ══════════ REGULAMIN ══════════ -->
+    <div class="view" id="view-regulamin">
 
-    <!-- RESULT -->
-    <div class="result-box" id="result">
-        <div class="result-placeholder">
-            <div class="icon">🔍</div>
-            Wyniki wyszukiwania pojawią się tutaj
+        <div class="header">
+            <a href="https://gkfbaza.pl/" class="logo-wrap">
+                <img src="https://dailymta.pl/FORUM/uploads/monthly_2024_01/logo512.png.b88e4caaa9beddd2d8365bfce33c4f2a.png" alt="Logo">
+            </a>
+            <div class="site-title">Regulamin <span>GKF</span></div>
+            <div class="site-sub">Główna Komisja Frakcyjna — DailyRPG</div>
+            <div class="meta-chips">
+                <span class="chip"><span class="cdot"></span>Obowiązuje wszystkich członków</span>
+                <span class="chip"><span class="cdot"></span>Zmiany od momentu publikacji</span>
+            </div>
         </div>
-    </div>
 
-    <!-- ADMIN PANEL -->
-    <div class="admin-section" id="adminPanel" style="display:none;">
-        <div class="admin-section-header">
-            <span class="tag">Admin</span>
-            <h3>Edycja rekordu</h3>
+        <div class="toc">
+            <div class="toc-title">Spis treści</div>
+            <div class="toc-list">
+                <div class="toc-item" onclick="scrollToSection('r-info')">        <span class="toc-num">01</span> Informacje ogólne</div>
+                <div class="toc-item" onclick="scrollToSection('r-struktura')">   <span class="toc-num">02</span> Struktura Komisji</div>
+                <div class="toc-item" onclick="scrollToSection('r-zakres')">      <span class="toc-num">03</span> Zakres działań na serwerze</div>
+                <div class="toc-item" onclick="scrollToSection('r-obowiazki')">   <span class="toc-num">04</span> Obowiązki członków Komisji</div>
+                <div class="toc-item" onclick="scrollToSection('r-uprawnienia')"> <span class="toc-num">05</span> Uprawnienia Komisji</div>
+                <div class="toc-item" onclick="scrollToSection('r-odwolania')">   <span class="toc-num">06</span> Odwołania od decyzji</div>
+                <div class="toc-item" onclick="scrollToSection('r-par1')">        <span class="toc-num">§1</span> Postanowienia ogólne</div>
+                <div class="toc-item" onclick="scrollToSection('r-par2')">        <span class="toc-num">§2</span> Obowiązki członków frakcji</div>
+                <div class="toc-item" onclick="scrollToSection('r-par3')">        <span class="toc-num">§3</span> Obowiązki zarządu frakcji</div>
+                <div class="toc-item" onclick="scrollToSection('r-par4')">        <span class="toc-num">§4</span> Postanowienia końcowe</div>
+            </div>
         </div>
-        <div class="admin-form-inner">
-            <div class="form-group">
-                <label>SID</label>
-                <input type="text" id="newSID" placeholder="np. 12345">
+
+        <div class="reg-section" id="r-info">
+            <div class="reg-section-header"><span class="reg-num">01</span><span class="reg-title">Informacje ogólne</span></div>
+            <div class="reg-body">
+                <p class="prose">Główna Komisja Frakcyjna została powołana w celu <strong>sprawowania kontroli nad działaniem wszystkich frakcji</strong> funkcjonujących na serwerze.</p>
+                <p class="prose">Jej zadaniem jest dbanie o prawidłowe funkcjonowanie struktur frakcyjnych, utrzymanie ładu wewnętrznego oraz wspieranie właściwej współpracy pomiędzy członkami frakcji.</p>
+                <div class="note-box"><span class="note-icon">⚖</span><span>Komisja oraz osoby wchodzące w jej skład zobowiązane są do działania w sposób <strong>rzetelny, neutralny i bezstronny</strong> podczas realizowania czynności kontrolnych.</span></div>
             </div>
-            <div class="form-group">
-                <label>Nick</label>
-                <input type="text" id="newNick" placeholder="nick gracza">
-            </div>
-            <div class="form-group full">
-                <label>Status</label>
-                <input type="text" id="newStatus" placeholder="np. BL / UNBL">
-            </div>
-            <div class="form-group full">
-                <label>Notatki</label>
-                <textarea id="newNotatki" placeholder="Dodatkowe informacje..."></textarea>
-            </div>
-            <button class="btn-save" onclick="saveUser()">Zapisz / Zaktualizuj rekord</button>
         </div>
-    </div>
+
+        <div class="reg-section" id="r-struktura">
+            <div class="reg-section-header"><span class="reg-num">02</span><span class="reg-title">Struktura Komisji Spraw Frakcyjnych</span></div>
+            <div class="reg-body">
+                <p class="prose">Naczelnik powoływany jest przez <strong>Zarząd serwera</strong>. Pozostali członkowie Komisji dobierani są przez Naczelnika.</p>
+                <p class="prose">Każda osoba dołączająca do Komisji jest wcześniej informowana o możliwości objęcia funkcji. Decyzja o przystąpieniu jest <strong>dobrowolna</strong> i nie może być wynikiem nacisku ze strony przełożonych.</p>
+                <div class="hierarchy">
+                    <div class="hierarchy-item"><span class="rank-badge rank-1">RANGA 1</span><span class="rank-name">Naczelnik</span></div>
+                    <div class="hierarchy-item"><span class="rank-badge rank-2">RANGA 2</span><span class="rank-name">Zastępca Naczelnika</span></div>
+                    <div class="hierarchy-item"><span class="rank-badge rank-3">RANGA 3</span><span class="rank-name">Członek Komisji</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="reg-section" id="r-zakres">
+            <div class="reg-section-header"><span class="reg-num">03</span><span class="reg-title">Zakres działań na serwerze</span></div>
+            <div class="reg-body">
+                <p class="prose">Kontrola ze strony Komisji realizowana jest poprzez <strong>cykliczne oraz losowe inspekcje frakcji</strong>, obejmujące m.in.:</p>
+                <div class="bullet-list">
+                    <div class="bullet-item">obserwację pracy lidera oraz kadry zarządzającej</div>
+                    <div class="bullet-item">analizę systemu awansów pod kątem sprawiedliwości</div>
+                    <div class="bullet-item">nadzorowanie egzaminów frakcyjnych i spotkań służbowych</div>
+                    <div class="bullet-item">ocenę ogólnego funkcjonowania frakcji</div>
+                </div>
+                <div class="note-box"><span class="note-icon">📌</span><span>Członkowie Komisji mają prawo reagować w przypadku zauważenia niewłaściwego zachowania. Osoby należące do Komisji zobowiązane są do <strong>zachowania poufności</strong> oraz godnego reprezentowania instytucji.</span></div>
+            </div>
+        </div>
+
+        <div class="reg-section" id="r-obowiazki">
+            <div class="reg-section-header"><span class="reg-num">04</span><span class="reg-title">Obowiązki członków Komisji</span></div>
+            <div class="reg-body">
+                <div class="bullet-list">
+                    <div class="bullet-item">bezstronne rozpatrywanie skarg (jawnych i anonimowych)</div>
+                    <div class="bullet-item">przeprowadzanie kontroli struktur frakcyjnych</div>
+                    <div class="bullet-item">inicjowanie i organizowanie spotkań frakcyjnych</div>
+                    <div class="bullet-item">nadzorowanie funkcjonowania frakcji</div>
+                    <div class="bullet-item">przeciwdziałanie faworyzowaniu pracowników</div>
+                    <div class="bullet-item">wybór nowych osób do struktur zarządczych</div>
+                    <div class="bullet-item">analiza wniosków dotyczących odwołania liderów lub zarządu frakcji</div>
+                    <div class="bullet-item">ochrona mienia frakcji oraz serwera</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="reg-section" id="r-uprawnienia">
+            <div class="reg-section-header"><span class="reg-num">05</span><span class="reg-title">Uprawnienia Komisji</span></div>
+            <div class="reg-body">
+                <div class="subsection">
+                    <div class="subsection-header">Rozpatrywanie skarg</div>
+                    <div class="subsection-body"><p class="prose">Komisja rozpatruje <strong>wszystkie skargi</strong> dotyczące funkcjonowania frakcji.</p></div>
+                </div>
+                <div class="subsection">
+                    <div class="subsection-header">Kontrola frakcji na serwerze gry</div>
+                    <div class="subsection-body">
+                        <p class="prose">Członkowie Komisji posiadający uprawnienia administracyjne mogą obserwować pracę funkcjonariuszy podczas służby. W przypadku braku takich uprawnień kontrola może odbywać się poprzez:</p>
+                        <div class="bullet-list" style="margin-top:8px;">
+                            <div class="bullet-item">wizytę w bazie frakcji</div>
+                            <div class="bullet-item">obserwację działań z pojazdu służbowego</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="subsection">
+                    <div class="subsection-header">Kontrola na serwerze Discord</div>
+                    <div class="subsection-body">
+                        <div class="bullet-list">
+                            <div class="bullet-item">członkowie Komisji mogą dołączać do kanałów pracowniczych frakcji</div>
+                            <div class="bullet-item">każdy członek Komisji ma prawo nadzorować przebieg egzaminów</div>
+                            <div class="bullet-item">dostęp do kanałów zarządczych przysługuje całemu GKF</div>
+                            <div class="bullet-item">zabronione jest zakłócanie pracy frakcji</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="note-box"><span class="note-icon">ℹ</span><span>Każda frakcja może zostać skontrolowana przez Komisję. Nakładanie konsekwencji za przewinienia należy do <strong>opiekunów frakcji</strong>.</span></div>
+            </div>
+        </div>
+
+        <div class="reg-section" id="r-odwolania">
+            <div class="reg-section-header"><span class="reg-num">06</span><span class="reg-title">Odwołania od decyzji Komisji</span></div>
+            <div class="reg-body">
+                <p class="prose">Komisja zobowiązana jest do rzetelnego i obiektywnego rozpatrywania wszystkich wniosków.</p>
+                <div class="note-box"><span class="note-icon">📩</span><span>W przypadku uzasadnionych zastrzeżeń zainteresowana strona ma prawo do <strong>jednokrotnego złożenia odwołania</strong> wraz z dowodami wskazującymi na nieprawidłowości.</span></div>
+            </div>
+        </div>
+
+        <div class="reg-section" id="r-par1">
+            <div class="reg-section-header"><span class="reg-num">§1</span><span class="reg-title">Postanowienia ogólne</span></div>
+            <div class="reg-body">
+                <div class="rule-item"><span class="rule-num">1.</span><span class="rule-text">Każdy użytkownik dołączający do frakcji <strong>automatycznie akceptuje regulamin</strong>.</span></div>
+                <div class="rule-item"><span class="rule-num">2.</span><span class="rule-text">Nieznajomość regulaminu <strong>nie zwalnia</strong> z obowiązku jego przestrzegania.</span></div>
+                <div class="rule-item"><span class="rule-num">3.</span><span class="rule-text">Naruszenie regulaminu może skutkować: karami frakcyjnymi, karami administracyjnymi lub <strong>usunięciem z frakcji</strong>.</span></div>
+                <div class="rule-item"><span class="rule-num">4.</span><span class="rule-text">Regulamin obowiązuje <strong>wszystkich członków frakcji</strong> niezależnie od stopnia, stażu czy funkcji.</span></div>
+            </div>
+        </div>
+
+        <div class="reg-section" id="r-par2">
+            <div class="reg-section-header"><span class="reg-num">§2</span><span class="reg-title">Obowiązki członków frakcji</span></div>
+            <div class="reg-body">
+                <div class="subsection">
+                    <div class="subsection-header">Wymagania podczas służby</div>
+                    <div class="subsection-body">
+                        <div class="bullet-list">
+                            <div class="bullet-item">posiadanie aktywnego statusu RP podczas służby</div>
+                            <div class="bullet-item">rzetelne wykonywanie obowiązków</div>
+                            <div class="bullet-item">zachowanie kultury osobistej wobec graczy i administracji</div>
+                            <div class="bullet-item">przestrzeganie regulaminu frakcji oraz regulaminu serwera</div>
+                            <div class="bullet-item">podporządkowanie się liderowi, zarządowi oraz GKF</div>
+                            <div class="bullet-item">stosowanie taryfikatora kar frakcji</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="subsection">
+                    <div class="subsection-header">Zakazy</div>
+                    <div class="subsection-body">
+                        <div class="bullet-list">
+                            <div class="bullet-item">przewożenia osób trzecich pojazdami frakcyjnymi bez uzasadnienia RP</div>
+                            <div class="bullet-item">przebywania jednocześnie we frakcji lub administracji innego serwera RP</div>
+                            <div class="bullet-item">wykonywania czynności przestępczych przez frakcje, których to nie dotyczy</div>
+                            <div class="bullet-item">udziału w eventach podczas służby</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="note-box"><span class="note-icon">⚠</span><span><strong>Wyjątek:</strong> Frakcje mogą przebywać na evencie G1 wyłącznie w celu zabezpieczenia wydarzeń. Po opuszczeniu frakcji należy odczekać minimum <strong>3 dni</strong> przed dołączeniem do innej frakcji.</span></div>
+            </div>
+        </div>
+
+        <div class="reg-section" id="r-par3">
+            <div class="reg-section-header"><span class="reg-num">§3</span><span class="reg-title">Obowiązki zarządu frakcji</span></div>
+            <div class="reg-body">
+                <div class="bullet-list">
+                    <div class="bullet-item">organizowanie odpraw frakcyjnych <strong>minimum raz w tygodniu</strong></div>
+                    <div class="bullet-item">przeprowadzanie rekrutacji <strong>minimum raz w miesiącu</strong></div>
+                    <div class="bullet-item">aktualizowanie składu frakcji</div>
+                    <div class="bullet-item">aktualizowanie ogłoszeń frakcyjnych</div>
+                    <div class="bullet-item">przestrzeganie regulaminów przez zarząd</div>
+                </div>
+                <div class="note-box"><span class="note-icon">📌</span><span>Pełnienie funkcji zarządczej <strong>nie daje przywileju łamania zasad</strong>. Do obowiązków zarządu należy także realizowanie tygodniowych norm służby, rozpatrywanie skarg na członków frakcji oraz przekazywanie poważniejszych spraw do GKF.</span></div>
+            </div>
+        </div>
+
+        <div class="reg-section" id="r-par4">
+            <div class="reg-section-header"><span class="reg-num">§4</span><span class="reg-title">Postanowienia końcowe</span></div>
+            <div class="reg-body">
+                <p class="prose">Główna Komisja Frakcyjna ma prawo do <strong>interpretacji regulaminu</strong> oraz podejmowania decyzji w sytuacjach nieujętych w jego treści.</p>
+                <div class="note-box"><span class="note-icon">📋</span><span>GKF zastrzega sobie prawo do <strong>wprowadzania zmian w regulaminie</strong>. Zmiany obowiązują od momentu publikacji. Regulamin obowiązuje wszystkich członków frakcji bez wyjątku.</span></div>
+            </div>
+        </div>
+
+        <div class="reg-footer">
+            Regulamin <span>GKF</span> — DailyRPG &nbsp;·&nbsp; Zmiany wchodzą w życie od momentu publikacji
+        </div>
+
+    </div><!-- /view-regulamin -->
 
 </div><!-- /page -->
 
 <script>
-let adminToken = null;
+/* ════ TABS ════ */
+function switchTab(tab) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('view-' + tab).classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-const API_URL      = "https://sid-api.zeberka-pasiasta69.workers.dev";
-const LS_LOGIN     = "sid_admin_login";
-const LS_PASS      = "sid_admin_pass";
+function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
+/* ════ ADMIN ════ */
+let adminToken = null;
+const API_URL  = "https://sid-api.zeberka-pasiasta69.workers.dev";
+const LS_LOGIN = "sid_admin_login";
+const LS_PASS  = "sid_admin_pass";
 
 function sanitize(str) {
     if (!str) return "";
     return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
-/* ── Admin bar ── */
 function showLoggedBadge(name) {
     document.getElementById("adminBar").innerHTML = `
         <span class="logged-badge">
@@ -638,20 +1023,15 @@ async function adminLogin() {
         } else {
             alert("Błędny login lub hasło");
         }
-    } catch (err) {
-        console.error("LOGIN ERROR:", err);
-        alert("Błąd logowania");
-    }
+    } catch (err) { console.error("LOGIN ERROR:", err); alert("Błąd logowania"); }
 }
 
 async function tryAutoLogin() {
     const login = localStorage.getItem(LS_LOGIN);
     const pass  = localStorage.getItem(LS_PASS);
     if (!login || !pass) return;
-
     document.getElementById("adminLogin").value = login;
     document.getElementById("adminPass").value  = pass;
-
     try {
         const res    = await fetch(`${API_URL}?action=login&login=${encodeURIComponent(login)}&password=${encodeURIComponent(pass)}`);
         const result = await res.json();
@@ -660,57 +1040,40 @@ async function tryAutoLogin() {
             document.getElementById("adminPanel").style.display = "block";
             showLoggedBadge(login);
         }
-    } catch (err) {
-        console.error("AUTO-LOGIN ERROR:", err);
-    }
+    } catch (err) { console.error("AUTO-LOGIN ERROR:", err); }
 }
 
-/* ── Save ── */
 async function saveUser() {
     if (!adminToken) { alert("Brak autoryzacji"); return; }
-
     const SID     = document.getElementById("newSID").value;
     const NICK    = document.getElementById("newNick").value;
     const STATUS  = document.getElementById("newStatus").value;
     const NOTATKI = document.getElementById("newNotatki").value;
     const ADMIN   = localStorage.getItem(LS_LOGIN) || "";
-
     try {
         const res    = await fetch(`${API_URL}?action=save&token=${adminToken}` +
-            `&SID=${encodeURIComponent(SID)}` +
-            `&NICK=${encodeURIComponent(NICK)}` +
-            `&STATUS=${encodeURIComponent(STATUS)}` +
-            `&NOTATKI=${encodeURIComponent(NOTATKI)}` +
+            `&SID=${encodeURIComponent(SID)}&NICK=${encodeURIComponent(NICK)}` +
+            `&STATUS=${encodeURIComponent(STATUS)}&NOTATKI=${encodeURIComponent(NOTATKI)}` +
             `&ADMIN=${encodeURIComponent(ADMIN)}`);
         const result = await res.json();
         if (result.success) { alert("Zapisano!"); searchSID(); }
-        else                { alert("Błąd zapisu"); }
-    } catch (err) {
-        console.error("SAVE ERROR:", err);
-        alert("Błąd zapisu");
-    }
+        else { alert("Błąd zapisu"); }
+    } catch (err) { console.error("SAVE ERROR:", err); alert("Błąd zapisu"); }
 }
 
-/* ── Search ── */
+/* ════ SEARCH ════ */
 async function searchSID() {
     const sid = document.getElementById("sidInput").value.trim();
     if (!sid) return;
-
     const box = document.getElementById("result");
     box.classList.remove("has-data");
     box.innerHTML = `<div class="result-placeholder"><div class="icon">⏳</div>Szukam...</div>`;
-
     try {
         const res  = await fetch(`${API_URL}?action=get`);
         const data = await res.json();
-
-        const user = data.find(u =>
-            String(u.SID).replace(/\s+/g, "") === sid.replace(/\s+/g, "")
-        );
-
+        const user = data.find(u => String(u.SID).replace(/\s+/g, "") === sid.replace(/\s+/g, ""));
         if (user) {
             box.classList.add("has-data");
-
             let formattedDate = "—";
             if (user.LAST_EDIT) {
                 formattedDate = new Date(user.LAST_EDIT).toLocaleString("pl-PL", {
@@ -718,37 +1081,18 @@ async function searchSID() {
                     hour: "2-digit", minute: "2-digit"
                 });
             }
-
             const notesHtml = sanitize(user.NOTATKI || "—").replace(/\n/g, "<br>");
-
             box.innerHTML = `
-                <div class="result-header">
-                    <span class="result-header-dot"></span>
-                    <h3>Dane użytkownika</h3>
-                </div>
+                <div class="result-header"><span class="result-header-dot"></span><h3>Dane użytkownika</h3></div>
                 <div class="data-grid">
-                    <div class="data-field">
-                        <div class="label">SID</div>
-                        <div class="value sid-val">${sanitize(user.SID)}</div>
-                    </div>
-                    <div class="data-field">
-                        <div class="label">Nick</div>
-                        <div class="value">${sanitize(user.NICK || "—")}</div>
-                    </div>
-                    <div class="data-field full">
-                        <div class="label">Status</div>
-                        <div class="value">${sanitize(user.STATUS || "—")}</div>
-                    </div>
-                    <div class="data-field full">
-                        <div class="label">Notatki</div>
-                        <div class="notes-val">${notesHtml}</div>
-                    </div>
+                    <div class="data-field"><div class="label">SID</div><div class="value sid-val">${sanitize(user.SID)}</div></div>
+                    <div class="data-field"><div class="label">Nick</div><div class="value">${sanitize(user.NICK || "—")}</div></div>
+                    <div class="data-field full"><div class="label">Status</div><div class="value">${sanitize(user.STATUS || "—")}</div></div>
+                    <div class="data-field full"><div class="label">Notatki</div><div class="notes-val">${notesHtml}</div></div>
                 </div>
                 <div class="result-footer">
                     Ostatnia edycja przez&nbsp;<strong>${sanitize(user.EDITED_BY || "—")}</strong>&nbsp;·&nbsp;${formattedDate}
-                </div>
-            `;
-
+                </div>`;
             if (adminToken) {
                 document.getElementById("newSID").value     = user.SID     || "";
                 document.getElementById("newNick").value    = user.NICK    || "";
@@ -756,11 +1100,7 @@ async function searchSID() {
                 document.getElementById("newNotatki").value = user.NOTATKI || "";
             }
         } else {
-            box.innerHTML = `
-                <div class="not-found">
-                    <span class="nf-icon">✕</span>
-                    Nie znaleziono gracza o podanym SID
-                </div>`;
+            box.innerHTML = `<div class="not-found"><span class="nf-icon">✕</span>Nie znaleziono gracza o podanym SID</div>`;
         }
     } catch (err) {
         console.error("SEARCH ERROR:", err);
@@ -768,15 +1108,12 @@ async function searchSID() {
     }
 }
 
-/* ── User count ── */
 async function loadUserCount() {
     try {
         const res  = await fetch(`${API_URL}?action=get`);
         const data = await res.json();
         document.getElementById("userCount").textContent = Array.isArray(data) ? data.length : "?";
-    } catch {
-        document.getElementById("userCount").textContent = "—";
-    }
+    } catch { document.getElementById("userCount").textContent = "—"; }
 }
 
 tryAutoLogin();
