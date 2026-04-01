@@ -106,9 +106,18 @@ body::after {
 .tab-btn.active { background: var(--red); color: #fff; font-weight: 600; }
 
 .admin-bar {
+    position: fixed;
+    top: 16px;
+    right: 16px;
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
+    background: rgba(10,6,20,0.92);
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border2);
+    z-index: 100;
+    backdrop-filter: blur(20px);
 }
 
 .admin-bar-label {
@@ -693,21 +702,133 @@ body::after {
 }
 
 .reg-footer span { color: var(--red); }
+
+/* ════════════════════════════
+   SKŁAD
+   ════════════════════════════ */
+.sklad-section {
+    margin-bottom: 32px;
+}
+
+.sklad-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 4px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sklad-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+.sklad-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.sklad-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+}
+
+.sklad-fraction-tag {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--red);
+    background: rgba(255,45,85,0.1);
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.sklad-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.sklad-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+}
+
+.sklad-row:last-child { border-bottom: none; }
+
+.sklad-row:hover { background: rgba(255,255,255,0.02); }
+
+.sklad-rank {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+    min-width: 200px;
+}
+
+.sklad-names {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.name-badge {
+    font-size: 13px;
+    font-family: var(--mono);
+    font-weight: 600;
+    color: var(--text);
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    padding: 3px 10px;
+    border-radius: 6px;
+}
+
+.name-badge.empty {
+    color: var(--muted);
+    font-family: var(--sans);
+    font-style: italic;
+    font-weight: 400;
+    border-color: var(--border);
+    background: transparent;
+}
+
+.name-badge.rank-naczelnik { border-color: rgba(255,45,85,0.4); color: var(--red); background: rgba(255,45,85,0.08); }
+.name-badge.rank-zastepca  { border-color: rgba(255,116,148,0.3); color: #ff7494; background: rgba(255,116,148,0.06); }
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
+<!-- NAV TABS (centered) -->
 <div class="topbar">
     <button class="tab-btn active" id="tab-sid"       onclick="switchTab('sid')">🔍 Wyszukiwarka SID</button>
     <button class="tab-btn"        id="tab-regulamin"  onclick="switchTab('regulamin')">📋 Regulamin GKF</button>
-    <div class="topbar-sep"></div>
-    <div class="admin-bar" id="adminBar">
-        <span class="admin-bar-label">Admin</span>
-        <input type="text"     id="adminLogin" placeholder="login">
-        <input type="password" id="adminPass"  placeholder="hasło">
-        <button class="btn-login" onclick="adminLogin()">Zaloguj</button>
-    </div>
+    <button class="tab-btn"        id="tab-sklad"      onclick="switchTab('sklad')">👥 Skład</button>
+</div>
+
+<!-- ADMIN BAR (fixed right) -->
+<div class="admin-bar" id="adminBar">
+    <span class="admin-bar-label">Admin</span>
+    <input type="text"     id="adminLogin" placeholder="login">
+    <input type="password" id="adminPass"  placeholder="hasło">
+    <button class="btn-login" onclick="adminLogin()">Zaloguj</button>
 </div>
 
 <div class="page">
@@ -927,7 +1048,7 @@ body::after {
                         </div>
                     </div>
                 </div>
-                <div class="note-box"><span class="note-icon">⚠</span><span><strong>Wyjątek:</strong> Frakcje mogą przebywać na evencie G1 wyłącznie w celu zabezpieczenia wydarzeń. Po opuszczeniu frakcji należy odczekać minimum <strong>3 dni</strong> przed dołączeniem do innej frakcji.</span></div>
+                <div class="note-box"><span class="note-icon">⚠</span><span><strong>Wyjątek:</strong> Frakcje mogą przebywać na serwerze G1 wyłącznie w celu zabezpieczenia wydarzeń. Po opuszczeniu frakcji należy odczekać minimum <strong>3 dni</strong> przed dołączeniem do innej frakcji.</span></div>
             </div>
         </div>
 
@@ -958,6 +1079,131 @@ body::after {
         </div>
 
     </div><!-- /view-regulamin -->
+
+    <!-- ══════════ SKŁAD ══════════ -->
+    <div class="view" id="view-sklad">
+
+        <div class="header">
+            <a href="https://gkfbaza.pl/" class="logo-wrap">
+                <img src="https://dailymta.pl/FORUM/uploads/monthly_2024_01/logo512.png.b88e4caaa9beddd2d8365bfce33c4f2a.png" alt="Logo">
+            </a>
+            <div class="site-title">Skład <span>GKF</span></div>
+            <div class="site-sub">Główna Komisja Frakcyjna — DailyRPG</div>
+        </div>
+
+        <!-- SKŁAD GKF -->
+        <div class="sklad-section">
+            <div class="sklad-section-title">Skład GKF</div>
+            <div class="sklad-card">
+                <div class="sklad-row">
+                    <span class="sklad-rank">Naczelnik</span>
+                    <div class="sklad-names"><span class="name-badge rank-naczelnik">Zeberka</span></div>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Zastępca Naczelnika</span>
+                    <div class="sklad-names"><span class="name-badge empty">Brak</span></div>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Pracownik</span>
+                    <div class="sklad-names">
+                        <span class="name-badge">moskyz7</span>
+                        <span class="name-badge">goodbye</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ZARZĄDY FRAKCJI -->
+        <div class="sklad-section">
+            <div class="sklad-section-title">Zarządy Frakcji</div>
+
+            <!-- SAPD -->
+            <div class="sklad-card" style="margin-bottom:16px;">
+                <div class="sklad-card-header">
+                    <span class="sklad-fraction-tag">SAPD</span>
+                    <span class="sklad-card-title">San Andreas Police Department</span>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Chief of Police</span>
+                    <div class="sklad-names"><span class="name-badge rank-naczelnik">goodbye</span></div>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Assistant Chief of Police</span>
+                    <div class="sklad-names"><span class="name-badge rank-zastepca">Dark0n</span></div>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Deputy Chief of Police</span>
+                    <div class="sklad-names"><span class="name-badge">B3dnareKKK</span></div>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Commander</span>
+                    <div class="sklad-names"><span class="name-badge empty">Brak</span></div>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Assistant of Commander</span>
+                    <div class="sklad-names"><span class="name-badge empty">Brak</span></div>
+                </div>
+            </div>
+
+            <!-- SAFD -->
+            <div class="sklad-card" style="margin-bottom:16px;">
+                <div class="sklad-card-header">
+                    <span class="sklad-fraction-tag">SAFD</span>
+                    <span class="sklad-card-title">San Andreas Fire Department</span>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Generalny Brygadier</span>
+                    <div class="sklad-names"><span class="name-badge rank-naczelnik">NoName</span></div>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">NadBrygadier</span>
+                    <div class="sklad-names"><span class="name-badge rank-zastepca">fraxo1</span></div>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Starszy Brygadier</span>
+                    <div class="sklad-names"><span class="name-badge">DiHMIAN</span></div>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Brygadier</span>
+                    <div class="sklad-names"><span class="name-badge empty">Brak</span></div>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Młodszy Brygadier</span>
+                    <div class="sklad-names"><span class="name-badge empty">Brak</span></div>
+                </div>
+            </div>
+
+            <!-- SARA -->
+            <div class="sklad-card">
+                <div class="sklad-card-header">
+                    <span class="sklad-fraction-tag">SARA</span>
+                    <span class="sklad-card-title">San Andreas Road Agency</span>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Główny Inżynier</span>
+                    <div class="sklad-names"><span class="name-badge rank-naczelnik">KariK</span></div>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Inżynier</span>
+                    <div class="sklad-names"><span class="name-badge rank-zastepca">Samuelson</span></div>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Zastępca Inżyniera</span>
+                    <div class="sklad-names"><span class="name-badge empty">Brak</span></div>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Główny Kierownik</span>
+                    <div class="sklad-names"><span class="name-badge empty">Brak</span></div>
+                </div>
+                <div class="sklad-row">
+                    <span class="sklad-rank">Kierownik</span>
+                    <div class="sklad-names"><span class="name-badge">WujekAdiTDI</span></div>
+                </div>
+            </div>
+
+        </div>
+
+    </div><!-- /view-sklad -->
 
 </div><!-- /page -->
 
